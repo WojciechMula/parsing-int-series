@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-FLAGS:=-std=c++11 -Wall -Wextra -pedantic -O3 $(CXXFLAGS)
+FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
 ALL=validate
@@ -16,6 +16,9 @@ validate: src/validate.cpp $(DEPS) $(OBJ)
 
 obj/input_generator.o: src/input_generator.cpp include/input_generator.h
 	$(CXX) $(FLAGS) $< -c -o $@
+
+src/blocks.inl: scripts/generator.py scripts/writer.py
+	python $< $@
 
 clean:
 	$(RM) $(ALL)

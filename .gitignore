@@ -1,2 +1,5 @@
 validate
+
 obj/*.o
+src/*.inl
+*.pyc
