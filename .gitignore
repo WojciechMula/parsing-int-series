@@ -1,4 +1,5 @@
 validate
+verify
 
 obj/*.o
 src/*.inl
