@@ -30,26 +30,16 @@ public:
             generate_input(x);
 
             const BlockInfo& b = blocks[x];
+            const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
+            const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
+
             if (b.element_size == 1) {
-                const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-                const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
-
                 convert_1digit(shuffled, b.element_count, &result[0]);
-
             } else if (b.element_size == 2) {
-                const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-                const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
-
                 convert_2digits(shuffled, b.element_count, &result[0]);
             } else if (b.element_size == 4) {
-                const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-                const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
-
                 convert_4digits(shuffled, b.element_count, &result[0]);
             } else if (b.element_size == 8) {
-                const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-                const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
-
                 convert_8digits(shuffled, b.element_count, &result[0]);
             } else {
                 unsupported += 1;
@@ -111,8 +101,8 @@ private:
 int main() {
 
     Verify verify;
-
     verify.run();
 
     return 0;
 }
+
