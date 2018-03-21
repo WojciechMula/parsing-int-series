@@ -3,10 +3,11 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=validate
+ALL=validate verify
 
 OBJ=obj/input_generator.o \
-    obj/sse-convert.o
+    obj/sse-convert.o \
+    obj/block_info.o
 
 DEPS=include/scalar-parser.h
 
@@ -24,7 +25,10 @@ obj/input_generator.o: src/input_generator.cpp include/input_generator.h
 obj/sse-convert.o: src/sse-convert.cpp include/sse-convert.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
-src/blocks.inl: scripts/generator.py scripts/writer.py
+obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
+	$(CXX) $(FLAGS) $< -c -o $@
+
+src/block_info.inl: scripts/generator.py scripts/writer.py
 	python $< $@
 
 clean:

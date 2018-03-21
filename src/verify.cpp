@@ -4,9 +4,9 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "block_info.h"
 #include "scalar-parser.h"
 #include "sse-convert.h"
-#include "blocks.inl"
 
 class Verify {
 

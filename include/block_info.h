@@ -13,3 +13,5 @@ struct BlockInfo {
     uint8_t pshufb_pattern[16];
 };
 
+extern BlockInfo blocks[65536];
+
