@@ -5,17 +5,6 @@
 #include "sse-convert.h"
 #include "block_info.h"
 
-void dump_epi8(__m128i x) {
-    uint8_t dump[16];
-
-    _mm_storeu_si128((__m128i*)dump, x);
-    putchar('[');
-    for (int i=15; i >= 0; i--) {
-        if (i < 15) putchar('|');
-        printf(" %2d ", dump[i]);
-    }
-    printf("]\n");
-}
 
 __m128i decimal_digits_mask(const __m128i input) {
     const __m128i ascii0 = _mm_set1_epi8('0');
@@ -23,12 +12,6 @@ __m128i decimal_digits_mask(const __m128i input) {
 
     const __m128i t0 = _mm_cmplt_epi8(input, ascii0); // t1 = (x < '0')
     const __m128i t1 = _mm_cmplt_epi8(input, ascii9); // t0 = (x <= '9')
-
-#if 0
-    dump_epi8(input);
-    dump_epi8(t0);
-    dump_epi8(t1);
-#endif
 
     return _mm_andnot_si128(t0, t1); // x <= '9' and x >= '0'
 }
