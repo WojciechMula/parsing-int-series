@@ -33,6 +33,8 @@ public:
             const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
             const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
 
+            using namespace sse;
+
             if (b.element_size == 1) {
                 convert_1digit(shuffled, b.element_count, &result[0]);
             } else if (b.element_size == 2) {

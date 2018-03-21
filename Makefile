@@ -6,10 +6,10 @@ FLAGS:=$(FLAGS) -Iinclude
 ALL=validate verify benchmark
 
 OBJ=obj/input_generator.o \
-    obj/sse-convert.o \
     obj/block_info.o
 
 DEPS=include/scalar-parser.h \
+         include/sse-convert.h \
      include/sse-parser.h
 
 all: $(ALL)
@@ -24,9 +24,6 @@ benchmark: src/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
 obj/input_generator.o: src/input_generator.cpp include/input_generator.h
-	$(CXX) $(FLAGS) $< -c -o $@
-
-obj/sse-convert.o: src/sse-convert.cpp include/sse-convert.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
