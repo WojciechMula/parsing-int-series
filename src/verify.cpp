@@ -51,7 +51,6 @@ public:
                 const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
 
                 convert_8digits(shuffled, b.element_count, &result[0]);
-                continue;
             } else {
                 unsupported += 1;
                 continue;
@@ -108,7 +107,6 @@ private:
     }
 
 };
-
 
 int main() {
 
