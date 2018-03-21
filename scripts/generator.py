@@ -54,9 +54,9 @@ class Parser(object):
                 start = i
             else:
                 # Note: a digits span which not ends within the chunk
-                #       doesn't appear in the result
+                #       doesn't appear in the result (we don't know how to parse it)
                 ranges.append(DigitsSpan(start, i - 1))
-            
+
             prev = c
 
         return ranges
@@ -107,14 +107,18 @@ class Optimizer(object):
                     break
             else:
                 break
-        
+
         if len(result) > 0:
             return result
         else:
             return None
 
 
-class BlockInfo:
+class BlockInfo(object):
+
+    __slots__ = ("id", "first_skip", "first_length", "total_skip",
+                 "ranges", "element_size", "pshufb_pattern")
+
     def __init__(self, number):
         self.id             = number
         self.first_skip     = 0
@@ -128,13 +132,24 @@ class BlockInfo:
         self.pshufb_pattern = [0x80] * 16
         for element, r in enumerate(self.ranges):
             index  = element * self.element_size
-            index += self.element_size - r.digits() # align to "right"
+            index += self.element_size - r.digits() # align to "right" within the vector's element
 
             for i in xrange(r.first, r.last + 1):
                 self.pshufb_pattern[index] = i
                 index += 1
 
-        #print self.pshufb_pattern
+    def __str__(self):
+        param = (
+            self.id,
+            self.first_skip,
+            self.first_length,
+            self.total_skip,
+            self.element_size,
+            self.ranges
+        )
+
+        return "<BlockInfo#%04x {first_skip=%d, first_length=%d, " \
+               "total_skip=%d, element_size=%d, ranges=%s}>" % param
 
 
 class Generator(object):
@@ -161,13 +176,13 @@ class Generator(object):
             block.ranges       = items
             block.element_size = element_size
 
-            #block.total_skip = items[-1] + 1
-            #try:
-            #    image = parser.image
-            #    while image[block.total_skip] == '_':
-            #        block.total_skip += 1
-            #except IndexError:
-            #    pass
+            block.total_skip = items[-1].last + 1
+            try:
+                image = parser.image
+                while image[block.total_skip] == '_':
+                    block.total_skip += 1
+            except IndexError:
+                pass
 
         block.build_pshubf_mask()
 

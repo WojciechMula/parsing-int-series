@@ -9,7 +9,6 @@ BlockInfo blocks[%(COUNT)d] = {
 };
 """
 
-
 class CPPWriter(object):
     def __init__(self, data):
         self.data = data
