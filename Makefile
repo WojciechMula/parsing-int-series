@@ -9,7 +9,8 @@ OBJ=obj/input_generator.o \
     obj/sse-convert.o \
     obj/block_info.o
 
-DEPS=include/scalar-parser.h
+DEPS=include/scalar-parser.h \
+     include/sse-parser.h
 
 all: $(ALL)
 
