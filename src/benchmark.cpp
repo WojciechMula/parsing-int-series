@@ -42,17 +42,19 @@ int main(int argc, char* argv[]) {
     Vector reference;
     Vector result;
 
-    measure_time("scalar : ", [&tmp, &reference] {
+    const auto t0 = measure_time("scalar : ", [&tmp, &reference] {
         scalar_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(reference));
     });
 
-    measure_time("SSE    : ", [&tmp, &result] {
+    const auto t1 = measure_time("SSE    : ", [&tmp, &result] {
         sse_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(result));
     });
 
+    printf("speed up: %0.2f\n", t0 / double(t1));
+
     const auto s1 = sum(reference);
     const auto s2 = sum(result);
-    printf("Reference results: %d %d\n", s1, s2);
+    printf("reference results: %lu %lu\n", s1, s2);
 
     if (s1 == s2) {
         return EXIT_SUCCESS;

@@ -10,7 +10,7 @@ Clock::time_point::rep elapsed(const Clock::time_point& t1, const Clock::time_po
 }
 
 template <typename FUN>
-void measure_time(const char* info, FUN fun) {
+Clock::time_point::rep measure_time(const char* info, FUN fun) {
 
     printf("%s", info);
     fflush(stdout);
@@ -18,6 +18,9 @@ void measure_time(const char* info, FUN fun) {
     fun();
     const auto t2 = Clock::now();
 
-    printf("%lu us\n", elapsed(t1, t2));
+    const auto dt = elapsed(t1, t2);
+    printf("%lu us\n", dt);
+
+    return dt;
 }
 
