@@ -1,5 +1,7 @@
 #include "input_generator.h"
 
+#include <cassert>
+
 static std::string random_string(size_t n, const std::string& set) {
     
     std::string result(n, ' ');
@@ -10,7 +12,10 @@ static std::string random_string(size_t n, const std::string& set) {
     return result;
 }
 
-std::string generate(size_t size, size_t longest_number, size_t longest_sep) {
+std::string generate(size_t size, size_t longest_number, size_t longest_separator) {
+
+    assert(longest_number > 0);
+    assert(longest_separator > 0);
 
     std::string result;
 
@@ -18,8 +23,8 @@ std::string generate(size_t size, size_t longest_number, size_t longest_sep) {
     static const std::string separators = ",; ";
 
     while (true) {
-        const size_t n = (rand() % (longest_number - 1)) + 1;
-        const size_t k = (rand() % (longest_sep - 1)) + 1;
+        const size_t n = std::max(size_t(1), rand() % longest_number);
+        const size_t k = std::max(size_t(1), rand() % longest_separator);
 
         const std::string number = random_string(n, numbers);
         const std::string sep    = random_string(k, separators);
