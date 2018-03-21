@@ -3,7 +3,7 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=validate verify
+ALL=validate verify benchmark
 
 OBJ=obj/input_generator.o \
     obj/sse-convert.o \
@@ -18,6 +18,9 @@ validate: src/validate.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
 verify: src/verify.cpp $(DEPS) $(OBJ)
+	$(CXX) $(FLAGS) $< $(OBJ) -o $@
+
+benchmark: src/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
 obj/input_generator.o: src/input_generator.cpp include/input_generator.h
