@@ -22,7 +22,7 @@ void scalar_parser(const char* data, size_t size, const char* separators, INSERT
                 digits = 0;
             }
         } else {
-            throw std::runtime_error("Wrong character");
+            throw std::runtime_error("Wrong character (scalar)");
         }
     }
 

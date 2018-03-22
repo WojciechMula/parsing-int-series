@@ -3,6 +3,7 @@
 #include <vector>
 #include <cassert>
 
+#include "scalar-parser.h"
 #include "sse-convert.h"
 #include "block_info.h"
 
@@ -20,11 +21,11 @@ __m128i decimal_digits_mask(const __m128i input) {
 
 
 template <typename MATCHER, typename INSERTER>
-void sse_parser(const char* string, size_t size, MATCHER matcher, INSERTER output) {
+void sse_parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
 
     char* data = const_cast<char*>(string);
     char* end  = data + size;
-    while (data < end) {
+    while (data + 16 < end) {
         const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
         const __m128i  t0 = decimal_digits_mask(input);
         const uint16_t digit_mask = _mm_movemask_epi8(t0);
@@ -81,4 +82,7 @@ void sse_parser(const char* string, size_t size, MATCHER matcher, INSERTER outpu
 
         data += b.total_skip;
     } // for
+
+    // process the tail
+    scalar_parser(data, string + size - data, separators, output);
 }
