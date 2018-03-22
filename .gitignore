@@ -1,6 +1,7 @@
 compare
 verify
 benchmark
+statistics
 
 obj/*.o
 src/*.inl
