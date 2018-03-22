@@ -108,34 +108,51 @@ class VerifyParser {
 
     static const size_t SIZE = 16 * 4;
     char buffer[SIZE + 1];
+    std::vector<uint32_t> result;
 
 public:
     VerifyParser() {}
 
     bool run() {
         for (size_t i=1; i <= 8; i++)
-            verify1number(i);
+            if (!verify1number(i)) {
+                puts("failed (case 1)");
+                dump();
+                return false;
+            }
 
-        return false;
+        puts("All OK");
+        return true;
     }
     
 private:
-    void verify1number(const size_t digits) {
+    bool verify1number(const size_t digits) {
         assert(digits > 0);
         assert(digits <= 8);
 
-
         for (size_t i=0; i < SIZE - digits; i++) {
             clear();
+
+            uint32_t reference = 0;
             for (size_t j=0; j < digits; j++) {
                 buffer[i + j] = j + 1 + '0';
+                reference = 10 * reference + (j + 1);
             }
-            dump();
 
-            std::vector<uint32_t> result;
             sse::NaiveMatcher<8> matcher('_');
+            result.clear();
             sse_parser(buffer, SIZE, matcher, std::back_inserter(result));
+
+            if (result.size() != 1) {
+                return false;
+            }
+
+            if (result[0] != reference) {
+                return false;
+            }
         }
+
+        return true;
     }
 
 
@@ -146,6 +163,21 @@ private:
 
     void dump() {
         puts(buffer);
+    }
+
+    void dump(const std::vector<uint32_t>& vec) {
+        printf("size = %lu: [", vec.size());
+
+        const size_t n = vec.size();
+        if (n) {
+            printf("%u", vec[0]);
+        }
+
+        for (size_t i=1; i < n; i++) {
+            printf(", %u", vec[i]);
+        }
+
+        printf("]\n");
     }
 
 };
