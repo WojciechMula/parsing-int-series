@@ -116,13 +116,12 @@ class Optimizer(object):
 
 class BlockInfo(object):
 
-    __slots__ = ("id", "first_skip", "first_length", "total_skip",
+    __slots__ = ("id", "first_skip", "total_skip",
                  "ranges", "element_size", "pshufb_pattern")
 
     def __init__(self, number):
         self.id             = number
         self.first_skip     = 0
-        self.first_length   = 0
         self.total_skip     = 0
         self.ranges         = []
         self.element_size   = 0
@@ -142,14 +141,13 @@ class BlockInfo(object):
         param = (
             self.id,
             self.first_skip,
-            self.first_length,
             self.total_skip,
             self.element_size,
             self.ranges
         )
 
-        return "<BlockInfo#%04x {first_skip=%d, first_length=%d, " \
-               "total_skip=%d, element_size=%d, ranges=%s}>" % param
+        return "<BlockInfo#%04x {first_skip=%d, total_skip=%d, " \
+               "element_size=%d, ranges=%s}>" % param
 
 
 class Generator(object):
@@ -172,7 +170,6 @@ class Generator(object):
             element_size, items = ret
 
             block.first_skip   = items[0].first
-            block.first_length = items[0].digits()
             block.ranges       = items
             block.element_size = element_size
 

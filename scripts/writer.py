@@ -1,4 +1,4 @@
-ITEM_PATTERN = "/* %(ID)04x */ {%(FIRST_SKIP)s, %(FIRST_LENGTH)s, %(TOTAL_SKIP)s, %(ELEMENT_COUNT)s, %(ELEMENT_SIZE)s, {%(PSHUFB_PATTERN)s}}"
+ITEM_PATTERN = "/* %(ID)04x */ {%(FIRST_SKIP)s, %(TOTAL_SKIP)s, %(ELEMENT_COUNT)s, %(ELEMENT_SIZE)s, {%(PSHUFB_PATTERN)s}}"
 FILE_PATTERN = """
 #pragma once
 
@@ -31,7 +31,6 @@ class CPPWriter(object):
         params = {
             'ID'             : block.id,
             'FIRST_SKIP'     : block.first_skip,
-            'FIRST_LENGTH'   : block.first_length,
             'TOTAL_SKIP'     : block.total_skip,
             'ELEMENT_COUNT'  : len(block.ranges),
             'ELEMENT_SIZE'   : block.element_size,

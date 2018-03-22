@@ -6,7 +6,6 @@
 
 struct BlockInfo {
     uint8_t first_skip;
-    uint8_t first_size;
     uint8_t total_skip;
     uint8_t element_count;
     uint8_t element_size;
