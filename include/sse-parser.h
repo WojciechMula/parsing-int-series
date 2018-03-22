@@ -63,8 +63,20 @@ void sse_parser(const char* string, size_t size, MATCHER matcher, INSERTER outpu
             convert_8digits(shuffled, b.element_count, output);
 
         } else {
-            printf("unsupported: %x\n", digit_mask);
-            assert(false);
+            uint32_t result = 0;
+            bool converted = false;
+            data += b.first_skip;
+            while (*data >= '0' && *data <= '9' && data < end) {
+                result = result * 10 + (*data - '0');
+                data += 1;
+                converted = true;
+            }
+
+            if (converted) {
+                *output++ = result;
+            }
+
+            continue;
         }
 
         data += b.total_skip;
