@@ -5,6 +5,7 @@
 
 #include "input_generator.h"
 #include "scalar-parser.h"
+#include "sse-matcher.h"
 #include "sse-parser.h"
 
 using Vector = std::vector<uint32_t>;
@@ -68,8 +69,11 @@ int main(int argc, char* argv[]) {
 
     Vector reference;
     Vector result;
-    scalar_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(reference));
-    sse_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(result));
+    const char* separators = ";, ";
+    scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
+
+    sse::NaiveMatcher<8> matcher(separators);
+    sse_parser(tmp.data(), tmp.size(), std::move(matcher), std::back_inserter(result));
 
     if (!compare(reference, result)) {
         puts(tmp.c_str());
