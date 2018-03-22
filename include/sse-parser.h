@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <cassert>
 
 #include "sse-convert.h"
@@ -17,21 +18,29 @@ __m128i decimal_digits_mask(const __m128i input) {
 }
 
 
-template <typename INSERTER>
-void sse_parser(const char* string, size_t size, const char* separators, INSERTER output) {
+
+template <typename MATCHER, typename INSERTER>
+void sse_parser(const char* string, size_t size, MATCHER matcher, INSERTER output) {
 
     char* data = const_cast<char*>(string);
     char* end  = data + size;
     while (data < end) {
         const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
-        const uint16_t mask = _mm_movemask_epi8(decimal_digits_mask(input));
+        const __m128i  t0 = decimal_digits_mask(input);
+        const uint16_t digit_mask = _mm_movemask_epi8(t0);
+        const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
 
-        if (mask == 0) {
+        if (digit_mask == 0) {
             data += 16;
             continue;
         }
 
-        const BlockInfo& b = blocks[mask];
+        if ((digit_mask | sep_mask) != 0xffff) {
+            throw std::runtime_error("Wrong character");
+        }
+
+
+        const BlockInfo& b = blocks[digit_mask];
         const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
         const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
 
@@ -54,7 +63,7 @@ void sse_parser(const char* string, size_t size, const char* separators, INSERTE
             convert_8digits(shuffled, b.element_count, output);
 
         } else {
-            printf("unsupported: %x\n", mask);
+            printf("unsupported: %x\n", digit_mask);
             assert(false);
         }
 

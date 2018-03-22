@@ -7,6 +7,7 @@
 #include "input_generator.h"
 #include "time_utils.h"
 #include "scalar-parser.h"
+#include "sse-matcher.h"
 #include "sse-parser.h"
 
 using Vector = std::vector<uint32_t>;
@@ -47,7 +48,8 @@ int main(int argc, char* argv[]) {
     });
 
     const auto t1 = measure_time("SSE    : ", [&tmp, &result] {
-        sse_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(result));
+        sse::NaiveMatcher<8> matcher(";, ");
+        sse_parser(tmp.data(), tmp.size(), std::move(matcher), std::back_inserter(result));
     });
 
     printf("speed up: %0.2f\n", t0 / double(t1));
