@@ -3,7 +3,7 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=validate verify benchmark
+ALL=compare verify benchmark
 
 OBJ=obj/input_generator.o \
     obj/block_info.o
@@ -15,7 +15,7 @@ DEPS=include/scalar-parser.h \
 
 all: $(ALL)
 
-validate: src/validate.cpp $(DEPS) $(OBJ)
+compare: src/compare.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
 verify: src/verify.cpp $(DEPS) $(OBJ)
