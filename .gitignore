@@ -5,3 +5,4 @@ benchmark
 obj/*.o
 src/*.inl
 *.pyc
+perf.data
