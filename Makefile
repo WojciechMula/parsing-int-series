@@ -15,16 +15,16 @@ DEPS=include/scalar-parser.h \
 
 all: $(ALL)
 
-compare: src/compare.cpp $(DEPS) $(OBJ)
+compare: test/compare.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
-verify: src/verify.cpp $(DEPS) $(OBJ)
+verify: test/verify.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
-benchmark: src/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ)
+benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
-obj/input_generator.o: src/input_generator.cpp include/input_generator.h
+obj/input_generator.o: test/input_generator.cpp include/input_generator.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
