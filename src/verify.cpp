@@ -8,7 +8,7 @@
 #include "scalar-parser.h"
 #include "sse-convert.h"
 
-class Verify {
+class VerifyConverters {
 
     char buffer[17];
     __m128i input;
@@ -17,12 +17,12 @@ class Verify {
     std::vector<uint32_t> reference;
 
 public:
-    Verify() {
+    VerifyConverters() {
         memset(buffer, 0, sizeof(buffer));
         result.resize(16);
     }
 
-    void run() {
+    bool run() {
 
         unsigned unsupported = 0;
 
@@ -49,11 +49,12 @@ public:
             }
 
             if (!compare(b.element_count)) {
-                return;
+                return false;
             }
         } // for
 
         printf("All OK (%d cases will never be supported by SIMD code)\n", unsupported);
+        return true;
     }
 
 private:
@@ -102,9 +103,14 @@ private:
 
 int main() {
 
-    Verify verify;
-    verify.run();
+    {
+        puts("Verify SSE converters");
+        VerifyConverters verify;
+        if (!verify.run()) {
+            return EXIT_FAILURE;
+        }
+    }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
