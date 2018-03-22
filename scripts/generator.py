@@ -183,6 +183,10 @@ class Generator(object):
                     block.total_skip += 1
             except IndexError:
                 pass
+        else:
+            if number != 0: # there are digits at the end of chunk
+                image = parser.image
+                block.first_skip = image.index(DIGIT)
 
         block.build_pshubf_mask()
 
