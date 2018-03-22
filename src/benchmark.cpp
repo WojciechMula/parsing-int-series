@@ -43,13 +43,15 @@ int main(int argc, char* argv[]) {
     Vector reference;
     Vector result;
 
-    const auto t0 = measure_time("scalar : ", [&tmp, &reference] {
-        scalar_parser(tmp.data(), tmp.size(), ";, ", std::back_inserter(reference));
+    const char* separators = ";, ";
+
+    const auto t0 = measure_time("scalar : ", [&tmp, &reference, separators] {
+        scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
     });
 
-    const auto t1 = measure_time("SSE    : ", [&tmp, &result] {
-        sse::NaiveMatcher<8> matcher(";, ");
-        sse_parser(tmp.data(), tmp.size(), std::move(matcher), std::back_inserter(result));
+    const auto t1 = measure_time("SSE    : ", [&tmp, &result, separators] {
+        sse::NaiveMatcher<8> matcher(separators);
+        sse_parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
     });
 
     printf("speed up: %0.2f\n", t0 / double(t1));
