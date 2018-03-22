@@ -7,6 +7,8 @@
 #include "block_info.h"
 #include "scalar-parser.h"
 #include "sse-convert.h"
+#include "sse-matcher.h"
+#include "sse-parser.h"
 
 class VerifyConverters {
 
@@ -101,11 +103,68 @@ private:
 
 };
 
+
+class VerifyParser {
+
+    static const size_t SIZE = 16 * 4;
+    char buffer[SIZE + 1];
+
+public:
+    VerifyParser() {}
+
+    bool run() {
+        for (size_t i=1; i <= 8; i++)
+            verify1number(i);
+
+        return false;
+    }
+    
+private:
+    void verify1number(const size_t digits) {
+        assert(digits > 0);
+        assert(digits <= 8);
+
+
+        for (size_t i=0; i < SIZE - digits; i++) {
+            clear();
+            for (size_t j=0; j < digits; j++) {
+                buffer[i + j] = j + 1 + '0';
+            }
+            dump();
+
+            std::vector<uint32_t> result;
+            sse::NaiveMatcher<8> matcher('_');
+            sse_parser(buffer, SIZE, matcher, std::back_inserter(result));
+        }
+    }
+
+
+    void clear() {
+        memset(buffer, '_', SIZE);
+        buffer[SIZE - 1] = 0;
+    }
+
+    void dump() {
+        puts(buffer);
+    }
+
+};
+
+
+
 int main() {
 
     {
         puts("Verify SSE converters");
         VerifyConverters verify;
+        if (!verify.run()) {
+            return EXIT_FAILURE;
+        }
+    }
+
+    {
+        puts("Verify SSE parser");
+        VerifyParser verify;
         if (!verify.run()) {
             return EXIT_FAILURE;
         }

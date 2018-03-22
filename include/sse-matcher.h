@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <cstring>
 
 #include "immintrin.h"
 
@@ -20,6 +21,10 @@ namespace sse {
             for (size_t i=0; i < n + 1; i++) {
                 letters[i] = _mm_set1_epi8(s[i]);
             }
+        }
+
+        NaiveMatcher(char c) {
+            letters[0] = _mm_set1_epi8(c);
         }
 
     public:
