@@ -41,4 +41,4 @@ src/block_info.inl: scripts/generator.py scripts/writer.py
 	python $< $@
 
 clean:
-	$(RM) $(ALL)
+	$(RM) $(ALL) obj/*.o
