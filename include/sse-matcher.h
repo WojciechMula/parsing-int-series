@@ -23,7 +23,7 @@ namespace sse {
             }
         }
 
-        NaiveMatcher(char c) {
+        NaiveMatcher(char c) : n(0) {
             letters[0] = _mm_set1_epi8(c);
         }
 
