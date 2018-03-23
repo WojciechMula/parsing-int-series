@@ -5,6 +5,7 @@
 
 #include "scalar-parser.h"
 #include "sse-convert.h"
+#include "sse-parser-statistics.h"
 #include "block_info.h"
 
 namespace sse {
@@ -19,31 +20,6 @@ namespace sse {
         return _mm_andnot_si128(t0, t1); // x <= '9' and x >= '0'
     }
 
-
-    struct Statistics {
-        size_t loops = 0;
-        size_t scalar_conversions = 0;
-        size_t digit1_calls = 0;
-        size_t digit1_conversion = 0;
-        size_t digit2_calls = 0;
-        size_t digit2_conversion = 0;
-        size_t digit4_calls = 0;
-        size_t digit4_conversion = 0;
-        size_t digit8_calls = 0;
-        size_t digit8_conversion = 0;
-
-        size_t get_all_converted() const {
-            return get_SSE_converted() + scalar_conversions;
-        }
-
-        size_t get_SSE_converted() const {
-            return digit1_conversion
-                 + digit2_conversion
-                 + digit4_conversion
-                 + digit8_conversion
-                 + scalar_conversions;
-        }
-    };
 
 } // namespace sse
 
