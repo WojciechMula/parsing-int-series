@@ -1,10 +1,14 @@
 #pragma once
 
 #include <cstdio>
+#include <map>
 
 namespace sse {
 
     struct Statistics {
+ 
+        std::map<int, size_t> total_skip_histogram;
+
         size_t loops = 0;
         size_t scalar_conversions = 0;
         size_t digit1_calls = 0;
@@ -32,6 +36,8 @@ namespace sse {
         void print() const {
             print(stdout);
         }
+
+        void init();
     };
 
 } // namespace sse

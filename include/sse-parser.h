@@ -90,6 +90,10 @@ namespace sse {
                 return data;
             }
 
+            if (collect_statistics) {
+                stats.total_skip_histogram[b.total_skip] += 1;
+            }
+
             return data + b.total_skip;
         }
 
@@ -99,6 +103,9 @@ namespace sse {
     Statistics parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
 
         Statistics stats;
+        if (collect_statistics) {
+            stats.init();
+        }
 
         char* data = const_cast<char*>(string);
         char* end  = data + size;
