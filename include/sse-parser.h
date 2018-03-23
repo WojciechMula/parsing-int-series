@@ -28,31 +28,12 @@ namespace sse {
 #   define SSE_COLLECT_STATISTICS false
 #endif
 
-    template <typename MATCHER, typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
-    Statistics parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+    namespace detail {
 
-        Statistics stats;
+        template <typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
+        char* parse(uint16_t mask, const __m128i input, char* data, char* end, Statistics& stats, INSERTER output) {
 
-        char* data = const_cast<char*>(string);
-        char* end  = data + size;
-        while (data + 16 < end) {
-            const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
-            const __m128i  t0 = decimal_digits_mask(input);
-            const uint16_t digit_mask = _mm_movemask_epi8(t0);
-            const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
-
-            if (collect_statistics) stats.loops += 1;
-
-            if (digit_mask == 0) {
-                data += 16;
-                continue;
-            }
-
-            if ((digit_mask | sep_mask) != 0xffff) {
-                throw std::runtime_error("Wrong character");
-            }
-
-            const BlockInfo& b = blocks[digit_mask];
+            const BlockInfo& b = blocks[mask];
             const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
             const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
 
@@ -106,10 +87,40 @@ namespace sse {
                     stats.scalar_conversions += 1;
                 }
 
+                return data;
+            }
+
+            return data + b.total_skip;
+        }
+
+    } // namespace detail
+
+    template <typename MATCHER, typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
+    Statistics parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+
+        Statistics stats;
+
+        char* data = const_cast<char*>(string);
+        char* end  = data + size;
+        while (data + 16 < end) {
+            const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
+            const __m128i  t0 = decimal_digits_mask(input);
+            const uint16_t digit_mask = _mm_movemask_epi8(t0);
+            const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
+
+            if (collect_statistics) stats.loops += 1;
+
+            if (digit_mask == 0) {
+                data += 16;
                 continue;
             }
 
-            data += b.total_skip;
+            if ((digit_mask | sep_mask) != 0xffff) {
+                throw std::runtime_error("Wrong character");
+            }
+
+            data = detail::parse(digit_mask, input, data, end, stats, output);
+
         } // for
 
         // process the tail
