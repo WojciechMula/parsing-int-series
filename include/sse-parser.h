@@ -21,8 +21,6 @@ namespace sse {
     }
 
 
-} // namespace sse
-
 #ifdef SSE_COLLECT_STATISTICS
 #   undef SSE_COLLECT_STATISTICS
 #   define SSE_COLLECT_STATISTICS true
@@ -30,95 +28,94 @@ namespace sse {
 #   define SSE_COLLECT_STATISTICS false
 #endif
 
-template <typename MATCHER, typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
-sse::Statistics sse_parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+    template <typename MATCHER, typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
+    Statistics parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
 
-    using namespace sse;
+        Statistics stats;
 
-    Statistics stats;
+        char* data = const_cast<char*>(string);
+        char* end  = data + size;
+        while (data + 16 < end) {
+            const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
+            const __m128i  t0 = decimal_digits_mask(input);
+            const uint16_t digit_mask = _mm_movemask_epi8(t0);
+            const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
 
-    char* data = const_cast<char*>(string);
-    char* end  = data + size;
-    while (data + 16 < end) {
-        const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
-        const __m128i  t0 = decimal_digits_mask(input);
-        const uint16_t digit_mask = _mm_movemask_epi8(t0);
-        const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
+            if (collect_statistics) stats.loops += 1;
 
-        if (collect_statistics) stats.loops += 1;
-
-        if (digit_mask == 0) {
-            data += 16;
-            continue;
-        }
-
-        if ((digit_mask | sep_mask) != 0xffff) {
-            throw std::runtime_error("Wrong character");
-        }
-
-        const BlockInfo& b = blocks[digit_mask];
-        const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-        const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
-
-        if (b.element_size == 1) {
-
-            convert_1digit(shuffled, b.element_count, output);
-            if (collect_statistics) {
-                stats.digit1_calls += 1;
-                stats.digit1_conversion += b.element_count;
+            if (digit_mask == 0) {
+                data += 16;
+                continue;
             }
 
-        } else if (b.element_size == 2) {
-
-            convert_2digits(shuffled, b.element_count, output);
-            if (collect_statistics) {
-                stats.digit2_calls += 1;
-                stats.digit2_conversion += b.element_count;
+            if ((digit_mask | sep_mask) != 0xffff) {
+                throw std::runtime_error("Wrong character");
             }
 
-        } else if (b.element_size == 4) {
+            const BlockInfo& b = blocks[digit_mask];
+            const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
+            const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
 
-            convert_4digits(shuffled, b.element_count, output);
-            if (collect_statistics) {
-                stats.digit4_calls += 1;
-                stats.digit4_conversion += b.element_count;
+            if (b.element_size == 1) {
+
+                convert_1digit(shuffled, b.element_count, output);
+                if (collect_statistics) {
+                    stats.digit1_calls += 1;
+                    stats.digit1_conversion += b.element_count;
+                }
+
+            } else if (b.element_size == 2) {
+
+                convert_2digits(shuffled, b.element_count, output);
+                if (collect_statistics) {
+                    stats.digit2_calls += 1;
+                    stats.digit2_conversion += b.element_count;
+                }
+
+            } else if (b.element_size == 4) {
+
+                convert_4digits(shuffled, b.element_count, output);
+                if (collect_statistics) {
+                    stats.digit4_calls += 1;
+                    stats.digit4_conversion += b.element_count;
+                }
+
+            } else if (b.element_size == 8) {
+
+                convert_8digits(shuffled, b.element_count, output);
+                if (collect_statistics) {
+                    stats.digit8_calls += 1;
+                    stats.digit8_conversion += b.element_count;
+                }
+
+            } else {
+                uint32_t result = 0;
+                bool converted = false;
+                data += b.first_skip;
+                while (*data >= '0' && *data <= '9' && data < end) {
+                    result = result * 10 + (*data - '0');
+                    data += 1;
+                    converted = true;
+                }
+
+                if (converted) {
+                    *output++ = result;
+                }
+
+                if (collect_statistics) {
+                    stats.scalar_conversions += 1;
+                }
+
+                continue;
             }
 
-        } else if (b.element_size == 8) {
+            data += b.total_skip;
+        } // for
 
-            convert_8digits(shuffled, b.element_count, output);
-            if (collect_statistics) {
-                stats.digit8_calls += 1;
-                stats.digit8_conversion += b.element_count;
-            }
+        // process the tail
+        scalar_parser(data, string + size - data, separators, output);
 
-        } else {
-            uint32_t result = 0;
-            bool converted = false;
-            data += b.first_skip;
-            while (*data >= '0' && *data <= '9' && data < end) {
-                result = result * 10 + (*data - '0');
-                data += 1;
-                converted = true;
-            }
+        return stats;
+    }
 
-            if (converted) {
-                *output++ = result;
-            }
-
-            if (collect_statistics) {
-                stats.scalar_conversions += 1;
-            }
-
-            continue;
-        }
-
-        data += b.total_skip;
-    } // for
-
-    // process the tail
-    scalar_parser(data, string + size - data, separators, output);
-
-    return stats;
-}
-
+} // namespace sse

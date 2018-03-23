@@ -164,7 +164,7 @@ private:
 
             sse::NaiveMatcher<8> matcher('_');
             result.clear();
-            sse_parser(buffer, SIZE, separators, matcher, std::back_inserter(result));
+            sse::parser(buffer, SIZE, separators, matcher, std::back_inserter(result));
 
             if (result.size() != 1) {
                 throw std::logic_error("size must be 1");
@@ -199,7 +199,7 @@ private:
 
                 sse::NaiveMatcher<8> matcher('_');
                 result.clear();
-                sse_parser(buffer, SIZE, separators, matcher, std::back_inserter(result));
+                sse::parser(buffer, SIZE, separators, matcher, std::back_inserter(result));
 
                 if (result.size() != 2) {
                     throw std::logic_error("size must be 2");

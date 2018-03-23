@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 
     const auto t1 = measure_time("SSE    : ", [&tmp, &result, separators] {
         sse::NaiveMatcher<8> matcher(separators);
-        sse_parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+        sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
     });
 
     printf("speed up: %0.2f\n", t0 / double(t1));

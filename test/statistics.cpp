@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
     const char* separators = ",; ";
     sse::NaiveMatcher<8> matcher(separators);
     std::vector<uint32_t> result;
-    const auto stats = sse_parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+    const auto stats = sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
     stats.print();
 
     return EXIT_SUCCESS;

@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
 
     sse::NaiveMatcher<8> matcher(separators);
-    sse_parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+    sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
 
     if (!compare(reference, result)) {
         puts(tmp.c_str());
