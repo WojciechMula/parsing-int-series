@@ -47,11 +47,10 @@ namespace sse {
         const __m128i t0 = _mm_subs_epu8(input, ascii0);
         const __m128i t1 = _mm_maddubs_epi16(t0, mul_1_10);
         const __m128i t2 = _mm_madd_epi16(t1, mul_1_100);
-        const __m128i t3 = _mm_packus_epi32(t2, t2);
 
-        uint16_t tmp[8] SSE_ALIGN;
+        uint32_t tmp[4] SSE_ALIGN;
 
-        _mm_store_si128((__m128i*)tmp, t3);
+        _mm_store_si128((__m128i*)tmp, t2);
         for (int i=0; i < count; i++)
             *output++ = tmp[i];
     }
