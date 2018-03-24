@@ -8,9 +8,50 @@
 #include "sse-matcher.h"
 #include "sse-parser.h"
 
-using Vector = std::vector<uint32_t>;
+#include "application.h"
 
-void dump(const Vector& vec) {
+class Compare: public Application {
+
+    using Vector = std::vector<uint32_t>;
+
+public:
+    Compare(int argc, char** argv) : Application(argc, argv) {}
+
+    bool run();
+
+private:
+    void dump(const Vector& vec) const;
+    bool compare(const Vector& expected, const Vector& result) const;
+
+};
+
+bool Compare::run() {
+
+    const auto tmp = generate();
+
+    Vector reference;
+    Vector result;
+    const char* separators = ";, ";
+    scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
+
+    sse::NaiveMatcher<8> matcher(separators);
+    sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+
+    if (!compare(reference, result)) {
+        puts(tmp.c_str());
+        puts("");
+        dump(reference);
+        puts("");
+        dump(result);
+
+        return false;
+    } else {
+        puts("All OK");
+        return true;
+    }
+}
+
+void Compare::dump(const Vector& vec) const {
     printf("size = %lu: [", vec.size());
 
     const size_t n = vec.size();
@@ -25,7 +66,7 @@ void dump(const Vector& vec) {
     printf("]\n");
 }
 
-bool compare(const Vector& expected, const Vector& result) {
+bool Compare::compare(const Vector& expected, const Vector& result) const {
 
     if (expected.size() != result.size()) {
         puts("different sizes");
@@ -46,53 +87,18 @@ bool compare(const Vector& expected, const Vector& result) {
     return true;
 }
 
-void print_usage();
-
 int main(int argc, char* argv[]) {
 
-    if (argc < 5) {
-        print_usage();
+    try {
+        Compare app(argc, argv);
+
+        return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
+
+    } catch (std::exception& e) {
+        printf("%s\n", e.what());
         return EXIT_FAILURE;
-    }
-
-    const size_t size = atoi(argv[1]);
-    const size_t longest_number = atoi(argv[2]);
-    const size_t longest_separator = atoi(argv[3]);
-    const int seed = atoi(argv[4]);
-
-    srand(seed);
-
-    printf("size = %lu, longest number = %lu, longest gap = %lu\n", size, longest_number, longest_separator);
-    const auto tmp = generate(size, longest_number, longest_separator);
-
-    assert(tmp.size() == size);
-
-    Vector reference;
-    Vector result;
-    const char* separators = ";, ";
-    scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
-
-    sse::NaiveMatcher<8> matcher(separators);
-    sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
-
-    if (!compare(reference, result)) {
-        puts(tmp.c_str());
-        puts("");
-        dump(reference);
-        puts("");
-        dump(result);
-
-        return EXIT_FAILURE;
-    } else {
-        puts("All OK");
+    } catch (Application::Exit&) {
         return EXIT_SUCCESS;
     }
 }
 
-
-void print_usage() {
-
-    puts("verify input_size longest_number longest_separator random_seed");
-    puts("");
-    puts("All parameters must be greater than zero");
-}

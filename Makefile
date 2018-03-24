@@ -18,8 +18,8 @@ DEPS=include/scalar-parser.h \
 
 all: $(ALL)
 
-compare: test/compare.cpp $(DEPS) $(OBJ)
-	$(CXX) $(FLAGS) $< $(OBJ) -o $@
+compare: test/compare.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
+	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
 
 verify: test/verify.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
