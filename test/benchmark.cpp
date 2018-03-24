@@ -4,41 +4,31 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "input_generator.h"
 #include "time_utils.h"
 #include "scalar-parser.h"
 #include "sse-matcher.h"
 #include "sse-parser.h"
 
-using Vector = std::vector<uint32_t>;
+#include "application.h"
 
-uint64_t sum(const Vector& vec) {
-    return std::accumulate(vec.begin(), vec.end(), 0);
-}
+class Benchmark: public Application {
 
-void print_usage();
+    using Vector = std::vector<uint32_t>;
 
-int main(int argc, char* argv[]) {
+public:
+    Benchmark(int argc, char** argv) : Application(argc, argv) {}
 
-    if (argc < 5) {
-        print_usage();
-        return EXIT_FAILURE;
+public:
+    bool run();
+
+    uint64_t sum(const Vector& vec) const {
+        return std::accumulate(vec.begin(), vec.end(), 0);
     }
+};
 
-    const size_t size = atoi(argv[1]);
-    const size_t longest_number = atoi(argv[2]);
-    const size_t longest_separator = atoi(argv[3]);
-    const int seed = atoi(argv[4]);
+bool Benchmark::run() {
 
-    srand(seed);
-
-    printf("size = %lu, longest number = %lu, longest gap = %lu\n", size, longest_number, longest_separator);
-    std::string tmp;
-    measure_time("generating random data ", [&tmp, size, longest_number, longest_separator]{
-        tmp = generate(size, longest_number, longest_separator);
-    });
-
-    assert(tmp.size() == size);
+    const std::string tmp = generate();
 
     Vector reference;
     Vector resultSSE;
@@ -69,17 +59,26 @@ int main(int argc, char* argv[]) {
     printf("reference results: %lu %lu %lu\n", s1, s2, s3);
 
     if (s1 == s2 && s1 == s3) {
-        return EXIT_SUCCESS;
+        return true;
     } else {
         puts("FAILED");
-        return EXIT_FAILURE;
+        return false;
     }
 }
 
 
-void print_usage() {
+int main(int argc, char* argv[]) {
 
-    puts("verify input_size longest_number longest_separator random_seed");
-    puts("");
-    puts("All parameters must be greater than zero");
+    try {
+        Benchmark app(argc, argv);
+
+        return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
+
+    } catch (std::exception& e) {
+        printf("%s\n", e.what());
+        return EXIT_FAILURE;
+    } catch (Application::Exit&) {
+        return EXIT_SUCCESS;
+    }
 }
+

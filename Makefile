@@ -5,9 +5,11 @@ FLAGS:=$(FLAGS) -Iinclude
 
 ALL=compare verify benchmark statistics
 
-OBJ=obj/input_generator.o \
-    obj/block_info.o \
-    obj/command_line.o
+OBJ=obj/block_info.o \
+    obj/input_generator.o
+
+CMDLINE_OBJ=obj/command_line.o \
+            obj/application.o
 
 DEPS=include/scalar-parser.h \
      include/sse-convert.h \
@@ -26,8 +28,9 @@ STATISTICS_OBJ=$(OBJ) obj/sse-parser-statistics.o
 statistics: test/statistics.cpp $(DEPS) $(STATISTICS_OBJ)
 	$(CXX) $(FLAGS) $< $(STATISTICS_OBJ) -o $@
 
-benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ)
-	$(CXX) $(FLAGS) $< $(OBJ) -o $@
+benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ) $(CMDLINE_OBJ)
+	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
+
 
 obj/input_generator.o: test/input_generator.cpp include/input_generator.h
 	$(CXX) $(FLAGS) $< -c -o $@
