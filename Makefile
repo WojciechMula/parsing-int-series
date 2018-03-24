@@ -35,6 +35,9 @@ obj/input_generator.o: test/input_generator.cpp include/input_generator.h
 obj/command_line.o: test/command_line.cpp include/command_line.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
+obj/application.o: test/application.cpp include/application.h include/command_line.h include/input_generator.h include/time_utils.h
+	$(CXX) $(FLAGS) $< -c -o $@
+
 obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
