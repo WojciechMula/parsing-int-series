@@ -116,7 +116,7 @@ class Optimizer(object):
 
 class BlockInfo(object):
 
-    __slots__ = ("id", "first_skip", "total_skip",
+    __slots__ = ("id", "image", "first_skip", "total_skip",
                  "ranges", "element_size", "pshufb_pattern")
 
     def __init__(self, number):
@@ -166,6 +166,7 @@ class Generator(object):
         ret = opt.get_best()
 
         block = BlockInfo(number)
+        block.image = parser.image
         if ret is not None:
             element_size, items = ret
 
