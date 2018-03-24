@@ -1,4 +1,4 @@
-ITEM_PATTERN = "/* %(ID)04x */ {%(FIRST_SKIP)s, %(TOTAL_SKIP)s, %(ELEMENT_COUNT)s, %(ELEMENT_SIZE)s, {%(PSHUFB_PATTERN)s}}"
+ITEM_PATTERN = "/* %(ID)04x %(SCALAR_COST)5.2f %(SSE_COST)5.2f */ {%(FIRST_SKIP)s, %(TOTAL_SKIP)s, %(ELEMENT_COUNT)s, %(ELEMENT_SIZE)s, {%(PSHUFB_PATTERN)s}}"
 FILE_PATTERN = """
 #pragma once
 
@@ -8,6 +8,8 @@ BlockInfo blocks[%(COUNT)d] = {
 %(ITEMS)s
 };
 """
+
+from cost import scalar_cost, SSE_cost
 
 class CPPWriter(object):
     def __init__(self, data):
@@ -35,6 +37,8 @@ class CPPWriter(object):
             'ELEMENT_COUNT'  : len(block.ranges),
             'ELEMENT_SIZE'   : block.element_size,
             'PSHUFB_PATTERN' : self._make_c_array(block.pshufb_pattern),
+            'SCALAR_COST'    : scalar_cost(block).value(),
+            'SSE_COST'       : SSE_cost(block).value(),
         }
 
         return ITEM_PATTERN % params

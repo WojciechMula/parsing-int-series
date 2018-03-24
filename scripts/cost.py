@@ -1,4 +1,5 @@
-from generator import SPACE, DIGIT
+SPACE = '_'
+DIGIT = 'd'
 
 class Cost(object):
     def __init__(self):
@@ -12,7 +13,7 @@ class Cost(object):
 
         self.store = 0
 
-    def cost(self):
+    def value(self):
         c = 1.00 * self.compare + \
             1.00 * self.multiplication + \
             1.00 * self.add_sub + \
@@ -27,7 +28,7 @@ class Cost(object):
             return c
             
     def __str__(self):
-        return '%0.2f' % self.cost()
+        return '%0.2f' % self.value()
 
 def scalar_cost(bi):
     cost = Cost()
