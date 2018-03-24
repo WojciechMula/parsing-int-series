@@ -8,40 +8,42 @@
 #define SSE_COLLECT_STATISTICS 1
 #include "sse-parser.h"
 
-using Vector = std::vector<uint32_t>;
+#include "application.h"
 
-void print_usage();
-void print_statistics(const sse::Statistics& stats);
+class StatisticsApp: public Application {
 
-int main(int argc, char* argv[]) {
+    using Vector = std::vector<uint32_t>;
 
-    if (argc < 5) {
-        print_usage();
-        return EXIT_FAILURE;
-    }
+public:
+    StatisticsApp(int argc, char** argv) : Application(argc, argv) {}
+    
+    void run();
+};
 
-    const size_t size = atoi(argv[1]);
-    const size_t longest_number = atoi(argv[2]);
-    const size_t longest_separator = atoi(argv[3]);
-    const int seed = atoi(argv[4]);
+void StatisticsApp::run() {
 
-    srand(seed);
-
-    printf("size = %lu, longest number = %lu, longest gap = %lu\n", size, longest_number, longest_separator);
-    const auto tmp = generate(size, longest_number, longest_separator);
+    const auto tmp = generate();
 
     const char* separators = ",; ";
     sse::NaiveMatcher<8> matcher(separators);
     std::vector<uint32_t> result;
     const auto stats = sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
     stats.print();
-
-    return EXIT_SUCCESS;
 }
 
-void print_usage() {
+int main(int argc, char* argv[]) {
 
-    puts("verify input_size longest_number longest_separator random_seed");
-    puts("");
-    puts("All parameters must be greater than zero");
+    try {
+        StatisticsApp app(argc, argv);
+
+        app.run();
+        return EXIT_SUCCESS;
+
+    } catch (std::exception& e) {
+        printf("%s\n", e.what());
+        return EXIT_FAILURE;
+    } catch (Application::Exit&) {
+        return EXIT_SUCCESS;
+    }
 }
+

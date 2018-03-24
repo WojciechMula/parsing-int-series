@@ -11,12 +11,12 @@
 
 #include "application.h"
 
-class Benchmark: public Application {
+class BenchmarkApp: public Application {
 
     using Vector = std::vector<uint32_t>;
 
 public:
-    Benchmark(int argc, char** argv) : Application(argc, argv) {}
+    BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
 
 public:
     bool run();
@@ -26,7 +26,7 @@ public:
     }
 };
 
-bool Benchmark::run() {
+bool BenchmarkApp::run() {
 
     const std::string tmp = generate();
 
@@ -70,7 +70,7 @@ bool Benchmark::run() {
 int main(int argc, char* argv[]) {
 
     try {
-        Benchmark app(argc, argv);
+        BenchmarkApp app(argc, argv);
 
         return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 

@@ -10,12 +10,12 @@
 
 #include "application.h"
 
-class Compare: public Application {
+class CompareApp: public Application {
 
     using Vector = std::vector<uint32_t>;
 
 public:
-    Compare(int argc, char** argv) : Application(argc, argv) {}
+    CompareApp(int argc, char** argv) : Application(argc, argv) {}
 
     bool run();
 
@@ -25,7 +25,7 @@ private:
 
 };
 
-bool Compare::run() {
+bool CompareApp::run() {
 
     const auto tmp = generate();
 
@@ -51,7 +51,7 @@ bool Compare::run() {
     }
 }
 
-void Compare::dump(const Vector& vec) const {
+void CompareApp::dump(const Vector& vec) const {
     printf("size = %lu: [", vec.size());
 
     const size_t n = vec.size();
@@ -66,7 +66,7 @@ void Compare::dump(const Vector& vec) const {
     printf("]\n");
 }
 
-bool Compare::compare(const Vector& expected, const Vector& result) const {
+bool CompareApp::compare(const Vector& expected, const Vector& result) const {
 
     if (expected.size() != result.size()) {
         puts("different sizes");
@@ -90,7 +90,7 @@ bool Compare::compare(const Vector& expected, const Vector& result) const {
 int main(int argc, char* argv[]) {
 
     try {
-        Compare app(argc, argv);
+        CompareApp app(argc, argv);
 
         return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 
