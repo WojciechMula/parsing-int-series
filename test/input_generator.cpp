@@ -2,6 +2,9 @@
 
 #include <cassert>
 
+static const std::string numbers    = "0123456789";
+static const std::string separators = ",; ";
+
 static
 std::string random_string(size_t n, const std::string& set) {
     
@@ -17,9 +20,6 @@ static
 std::string generate(size_t size, size_t longest_number) {
 
     std::string result;
-
-    static const std::string numbers    = "0123456789";
-    static const std::string separators = ",; ";
 
     while (true) {
         const size_t n = std::max(size_t(1), rand() % longest_number);
@@ -48,9 +48,6 @@ std::string generate(size_t size, size_t longest_number, size_t longest_separato
 
     std::string result;
 
-    static const std::string numbers    = "0123456789";
-    static const std::string separators = ",; ";
-
     while (true) {
         const size_t n = std::max(size_t(1), rand() % longest_number);
         const size_t k = std::max(size_t(1), rand() % longest_separator);
@@ -68,3 +65,26 @@ std::string generate(size_t size, size_t longest_number, size_t longest_separato
     }
 }
 
+std::string generate(size_t size,
+                     std::mt19937 random,
+                     std::discrete_distribution<> num,
+                     std::discrete_distribution<> sep) {
+
+    std::string result;
+
+    while (true) {
+        const size_t n = num(random) + 1;
+        const size_t k = sep(random) + 1;
+
+        const std::string number = random_string(n, numbers);
+        const std::string sep    = random_string(k, separators);
+
+        if (result.size() + n + k < size) {
+            result += number;
+            result += sep;
+        } else {
+            result += random_string(size - result.size(), separators);
+            return result;
+        }
+    }
+}
