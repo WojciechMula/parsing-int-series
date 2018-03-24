@@ -1,0 +1,72 @@
+#pragma once
+
+#include <cstddef>
+#include <cstdint>
+#include <immintrin.h>
+
+namespace scalar {
+
+    template<int N>
+    uint32_t convert(const char* s, uint32_t prev) {
+        return convert<N - 1>(s + 1, prev * 10 + uint8_t(s[0]) - '0');
+    }
+
+    template<>
+    uint32_t convert<0>(const char* /*s*/, uint32_t prev) {
+        return prev;
+    }
+
+    template<int N>
+    uint32_t convert(const char* s) {
+        return convert<N>(s, 0);
+    }
+
+    __m128i decimal_digits_mask(const __m128i input) {
+        const __m128i ascii0 = _mm_set1_epi8('0');
+        const __m128i ascii9 = _mm_set1_epi8('9' + 1);
+
+        const __m128i t0 = _mm_cmplt_epi8(input, ascii0); // t1 = (x < '0')
+        const __m128i t1 = _mm_cmplt_epi8(input, ascii9); // t0 = (x <= '9')
+
+        return _mm_andnot_si128(t0, t1); // x <= '9' and x >= '0'
+    }
+
+}
+
+template <typename MATCHER, typename INSERTER>
+void hybrid_parser(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+    char* data = const_cast<char*>(string);
+    char* end  = data + size;
+    bool has_last = false;
+    uint32_t val = 0;
+    while (data + 16 < end) {
+        const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
+        const __m128i  t0 = scalar::decimal_digits_mask(input);
+        const uint16_t digit_mask = _mm_movemask_epi8(t0);
+        const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
+
+        if ((digit_mask | sep_mask) != 0xffff) {
+            throw std::runtime_error("Wrong character");
+        }
+
+        if (digit_mask == 0) {
+            data += 16;
+            continue;
+        }
+
+        switch (digit_mask & 0xff) {
+            #include "hybrid-parser.inl"
+        }
+
+        data += 8;
+
+        switch (digit_mask >> 8) {
+            #include "hybrid-parser.inl"
+        }
+
+        data += 8;
+    } // for
+
+    // process the tail
+    scalar_parser(data, string + size - data, separators, output);
+}

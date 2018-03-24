@@ -3,7 +3,8 @@ verify
 benchmark
 statistics
 
-obj/*.o
-src/*.inl
+*.o
+*.inl
 *.pyc
+
 perf.data

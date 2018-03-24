@@ -12,6 +12,7 @@ CMDLINE_OBJ=obj/command_line.o \
             obj/application.o
 
 DEPS=include/scalar-parser.h \
+     include/hybrid-parser.h \
      include/sse-convert.h \
      include/sse-matcher.h \
      include/sse-parser.h
@@ -28,7 +29,7 @@ STATISTICS_OBJ=$(OBJ) $(CMDLINE_OBJ) obj/sse-parser-statistics.o
 statistics: test/statistics.cpp $(DEPS) $(STATISTICS_OBJ)
 	$(CXX) $(FLAGS) $< $(STATISTICS_OBJ) -o $@
 
-benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ) $(CMDLINE_OBJ)
+benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ) $(CMDLINE_OBJ) include/hybrid-parser.inl
 	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
 
 obj/input_generator.o: test/input_generator.cpp include/input_generator.h
@@ -48,6 +49,9 @@ obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp
 
 src/block_info.inl: scripts/generator.py scripts/writer.py
 	python $< $@
+
+include/hybrid-parser.inl: scripts/hybrid-generator.py
+	python $< > $@
 
 clean:
 	$(RM) $(ALL) obj/*.o
