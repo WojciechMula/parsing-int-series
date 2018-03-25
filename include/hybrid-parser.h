@@ -43,9 +43,9 @@ void hybrid_parser(const char* string, size_t size, const char* separators, MATC
         const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
         const __m128i  t0 = scalar::decimal_digits_mask(input);
         const uint16_t digit_mask = _mm_movemask_epi8(t0);
-        const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
+        const uint16_t valid_mask = _mm_movemask_epi8(matcher.get_mask(input, t0));
 
-        if ((digit_mask | sep_mask) != 0xffff) {
+        if (valid_mask != 0xffff) {
             throw std::runtime_error("Wrong character");
         }
 

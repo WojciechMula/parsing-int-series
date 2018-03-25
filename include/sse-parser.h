@@ -113,17 +113,17 @@ namespace sse {
             const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
             const __m128i  t0 = decimal_digits_mask(input);
             const uint16_t digit_mask = _mm_movemask_epi8(t0);
-            const uint16_t sep_mask   = _mm_movemask_epi8(matcher.get_mask(input, t0));
+            const uint16_t valid_mask = _mm_movemask_epi8(matcher.get_mask(input, t0));
 
             if (collect_statistics) stats.loops += 1;
+
+            if (valid_mask != 0xffff) {
+                throw std::runtime_error("Wrong character");
+            }
 
             if (digit_mask == 0) {
                 data += 16;
                 continue;
-            }
-
-            if ((digit_mask | sep_mask) != 0xffff) {
-                throw std::runtime_error("Wrong character");
             }
 
             data = detail::parse(digit_mask, input, data, end, stats, output);
@@ -150,36 +150,36 @@ namespace sse {
             const __m128i  input3 = _mm_loadu_si128(reinterpret_cast<__m128i*>(data + 3*16));
             const __m128i  t0 = decimal_digits_mask(input0);
             const uint64_t digit_mask0 = _mm_movemask_epi8(t0);
-            const uint64_t sep_mask0   = _mm_movemask_epi8(matcher.get_mask(input0, t0));
+            const uint64_t valid_mask0 = _mm_movemask_epi8(matcher.get_mask(input0, t0));
             const __m128i  t1 = decimal_digits_mask(input1);
             const uint64_t digit_mask1 = _mm_movemask_epi8(t1);
-            const uint64_t sep_mask1   = _mm_movemask_epi8(matcher.get_mask(input1, t1));
+            const uint64_t valid_mask1 = _mm_movemask_epi8(matcher.get_mask(input1, t1));
             const __m128i  t2 = decimal_digits_mask(input2);
             const uint64_t digit_mask2 = _mm_movemask_epi8(t2);
-            const uint64_t sep_mask2   = _mm_movemask_epi8(matcher.get_mask(input2, t2));
+            const uint64_t valid_mask2 = _mm_movemask_epi8(matcher.get_mask(input2, t2));
             const __m128i  t3 = decimal_digits_mask(input3);
             const uint64_t digit_mask3 = _mm_movemask_epi8(t3);
-            const uint64_t sep_mask3   = _mm_movemask_epi8(matcher.get_mask(input3, t3));
+            const uint64_t valid_mask3 = _mm_movemask_epi8(matcher.get_mask(input3, t3));
+
+            const uint64_t valid_mask = valid_mask0
+                                      | (valid_mask1 << (1*16))
+                                      | (valid_mask2 << (2*16))
+                                      | (valid_mask3 << (3*16));
+
+            if (collect_statistics) stats.loops += 1;
+
+            if (valid_mask != uint64_t(-1)) {
+                throw std::runtime_error("Wrong character");
+            }
 
             const uint64_t digit_mask = digit_mask0
                                      | (digit_mask1 << (1*16))
                                      | (digit_mask2 << (2*16))
                                      | (digit_mask3 << (3*16));
 
-            const uint64_t sep_mask = sep_mask0
-                                    | (sep_mask1 << (1*16))
-                                    | (sep_mask2 << (2*16))
-                                    | (sep_mask3 << (3*16));
-
-            if (collect_statistics) stats.loops += 1;
-
             if (digit_mask == 0) {
-                data += 16;
+                data += 16*4;
                 continue;
-            }
-
-            if ((digit_mask | sep_mask) != uint64_t(-1)) {
-                throw std::runtime_error("Wrong character");
             }
 
             __m128i input = input0;
