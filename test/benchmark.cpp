@@ -22,6 +22,14 @@ public:
 public:
     bool run();
 
+private:
+    std::string tmp;
+    Vector reference;
+    Vector resultScalar2;
+    Vector resultSSE;
+    Vector resultSSEblock;
+
+private:
     uint64_t sum(const Vector& vec) const {
         return std::accumulate(vec.begin(), vec.end(), 0);
     }
@@ -29,32 +37,49 @@ public:
 
 bool BenchmarkApp::run() {
 
-    const std::string tmp = generate();
+    printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
 
-    Vector reference;
-    Vector resultScalar2;
-    Vector resultSSE;
-    Vector resultSSEblock;
+    tmp = generate();
 
     const char* separators = ";, ";
 
-    const auto t0 = measure_time("scalar      : ", [&tmp, &reference, separators] {
-        scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
+    const auto t0 = measure_time("scalar      : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            reference.clear();
+            scalar_parser(tmp.data(), tmp.size(), separators,
+                          std::back_inserter(reference));
+        }
     });
 
-    const auto t1 = measure_time("hybrid      : ", [&tmp, &resultScalar2, separators] {
-        sse::NaiveMatcher<8> matcher(separators);
-        hybrid_parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(resultScalar2));
+    const auto t1 = measure_time("hybrid      : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            resultScalar2.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            hybrid_parser(tmp.data(), tmp.size(), separators,
+                          std::move(matcher), std::back_inserter(resultScalar2));
+        }
     });
 
-    const auto t2 = measure_time("SSE         : ", [&tmp, &resultSSE, separators] {
-        sse::NaiveMatcher<8> matcher(separators);
-        sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(resultSSE));
+    const auto t2 = measure_time("SSE         : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            resultSSE.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            sse::parser(tmp.data(), tmp.size(), separators,
+                        std::move(matcher), std::back_inserter(resultSSE));
+        }
     });
 
-    const auto t3 = measure_time("SSE (block) : ", [&tmp, &resultSSEblock, separators] {
-        sse::NaiveMatcher<8> matcher(separators);
-        sse::parser_block(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(resultSSEblock));
+    const auto t3 = measure_time("SSE (block) : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            resultSSEblock.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            sse::parser_block(tmp.data(), tmp.size(), separators,
+                              std::move(matcher), std::back_inserter(resultSSEblock));
+        }
     });
 
     puts("");

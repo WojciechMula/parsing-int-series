@@ -29,6 +29,11 @@ protected:
 
     std::string generate();
 
+public:
+    size_t get_size() const {
+        return size;
+    }
+
     size_t get_loop_count() const {
         return loop_count;
     }
