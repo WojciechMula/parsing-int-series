@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <immintrin.h>
+#include "sse-utils.h"
 
 namespace scalar {
 
@@ -21,16 +22,6 @@ namespace scalar {
         return convert<N>(s, 0);
     }
 
-    __m128i decimal_digits_mask(const __m128i input) {
-        const __m128i ascii0 = _mm_set1_epi8('0');
-        const __m128i ascii9 = _mm_set1_epi8('9' + 1);
-
-        const __m128i t0 = _mm_cmplt_epi8(input, ascii0); // t1 = (x < '0')
-        const __m128i t1 = _mm_cmplt_epi8(input, ascii9); // t0 = (x <= '9')
-
-        return _mm_andnot_si128(t0, t1); // x <= '9' and x >= '0'
-    }
-
 }
 
 template <typename MATCHER, typename INSERTER>
@@ -41,7 +32,7 @@ void hybrid_parser(const char* string, size_t size, const char* separators, MATC
     uint32_t val = 0;
     while (data + 16 < end) {
         const __m128i  input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
-        const __m128i  t0 = scalar::decimal_digits_mask(input);
+        const __m128i  t0 = sse::decimal_digits_mask(input);
         const uint16_t digit_mask = _mm_movemask_epi8(t0);
         const uint16_t valid_mask = _mm_movemask_epi8(matcher.get_mask(input, t0));
 

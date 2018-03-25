@@ -13,6 +13,7 @@ CMDLINE_OBJ=obj/command_line.o \
 
 DEPS=include/scalar-parser.h \
      include/hybrid-parser.h \
+     include/sse-utils.h \
      include/sse-convert.h \
      include/sse-matcher.h \
      include/sse-parser.h
