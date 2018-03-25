@@ -91,9 +91,16 @@ def generate_case(number, ranges):
         result.append("has_last = true;");
         return result
 
+    def generate_continuation():
+        result.append("if (has_last) {")
+        result.append("   has_last = false;")
+        result.append("    *output++ = val;")
+        result.append("}")
+
     def generate_first(span):
         result.append("if (has_last) {")
         result.append("   val = %s;" % conv_fun(span, "val"))
+        result.append("   has_last = false;")
         result.append("} else {")
         result.append("   val = %s;" % conv_fun(span))
         result.append("}")
@@ -112,9 +119,7 @@ def generate_case(number, ranges):
             generate_first(span)
             return result
 
-        result.append("if (has_last) {")
-        result.append("    *output++ = val;")
-        result.append("}")
+        generate_continuation();
         if span.last == 7:
             generate_last(span)
         else:
@@ -129,6 +134,7 @@ def generate_case(number, ranges):
     if first.first == 0:
         generate_first(first)
     else:
+        generate_continuation();
         generate_middle(first)
 
     for span in middle:
