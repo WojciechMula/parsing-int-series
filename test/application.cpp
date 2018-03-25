@@ -52,7 +52,7 @@ Application::Application(int argc, char* argv[])
 
     size        = cmdline.parse_value<size_t>("--size", to_int);
     debug_size  = cmdline.parse_value<size_t>("--debug", to_int, 0);
-    loop_count  = cmdline.parse_value<size_t>("--loops", to_int, 0);
+    loop_count  = cmdline.parse_value<size_t>("--loops", to_int, 1);
 
     const auto seed = cmdline.parse_value("--seed", to_int, 0);
     random.seed(seed);
