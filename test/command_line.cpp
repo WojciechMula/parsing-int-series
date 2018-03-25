@@ -37,7 +37,7 @@ std::string CommandLine::get_value(const std::string& option) const {
             try {
                 return args[i + 1];
             } catch (std::out_of_range&) {
-                throw std::logic_error("Argument " + args[i] + " should be followed by a value");
+                throw OptionNotFound("Argument " + args[i] + " should be followed by a value");
             }
         }
     }
@@ -49,7 +49,7 @@ std::string CommandLine::get_value(const std::string& option) const {
         }
     }
 
-    throw std::logic_error("Argument " + option + " not found");
+    throw OptionNotFound("Argument " + option + " not found");
 }
 
 std::string CommandLine::get_value(const std::string& option, const std::string& defvalue) const {

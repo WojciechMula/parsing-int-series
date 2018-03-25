@@ -17,6 +17,7 @@ private:
 
     size_t size;
     size_t debug_size;
+    size_t loop_count;
     std::discrete_distribution<> numbers;
     std::discrete_distribution<> separators;
 
@@ -27,6 +28,10 @@ protected:
     Application(int argc, char* argv[]);
 
     std::string generate();
+
+    size_t get_loop_count() const {
+        return loop_count;
+    }
 
 private:
     void print_help() const;

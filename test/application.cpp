@@ -46,19 +46,23 @@ Application::Application(int argc, char* argv[])
         throw Application::Exit();
     }
 
-    size = std::stol(cmdline.get_value("--size"));
-    debug_size = std::stol(cmdline.get_value("--debug", "0"));
-    const auto seed = std::stol(cmdline.get_value("--seed", "0"));
+    auto to_int = [](const std::string& val) {
+        return std::stol(val);
+    };
+
+    size        = cmdline.parse_value<size_t>("--size", to_int);
+    debug_size  = cmdline.parse_value<size_t>("--debug", to_int, 0);
+    loop_count  = cmdline.parse_value<size_t>("--loops", to_int, 0);
+
+    const auto seed = cmdline.parse_value("--seed", to_int, 0);
     random.seed(seed);
 
     {
-        const auto val = cmdline.get_value("--num");
-        const auto arr = parse_array(val);
+        const auto arr = cmdline.parse_value<std::vector<long>>("--num", parse_array);
         numbers = std::discrete_distribution<>(arr.begin(), arr.end());
     }
     {
-        const auto val = cmdline.get_value("--sep", "1");
-        const auto arr = parse_array(val);
+        const auto arr = cmdline.parse_value<std::vector<long>>("--sep", parse_array, {1});
         separators = std::discrete_distribution<>(arr.begin(), arr.end());
     }
 
@@ -88,9 +92,11 @@ void Application::print_help() const {
     puts("options are");
     puts("");
     puts("--size=NUMBER         input size (in bytes)");
+    puts("--loops=NUMBER        how many times a test must be repeated [default: 1]");
     puts("--seed=NUMBER         seed for random number generator [default: 0]");
     puts("--num=DISTRIBUTION    distribution of lengths of numbers");
     puts("--sep=DISTRIBUTION    distribution of lengths of gaps between numbers [default: '1']");
     puts("--debug=K             prints K first bytes of generated input [default: 0]");
 }
+
 
