@@ -16,8 +16,8 @@ namespace sse {
         char* parse(uint16_t mask, const __m128i input, char* data, char* end, Statistics& stats, INSERTER output) {
 
             const BlockInfo& b = blocks[mask];
-            const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-            const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
+            const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)b.shuffle_digits);
+            const __m128i shuffled = _mm_shuffle_epi8(input, shuffle_digits);
 
             if (b.element_size == 1) {
 

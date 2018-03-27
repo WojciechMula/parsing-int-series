@@ -32,8 +32,8 @@ public:
             generate_input(x);
 
             const BlockInfo& b = blocks[x];
-            const __m128i pshufb_pattern = _mm_loadu_si128((const __m128i*)b.pshufb_pattern);
-            const __m128i shuffled = _mm_shuffle_epi8(input, pshufb_pattern);
+            const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)b.shuffle_digits);
+            const __m128i shuffled = _mm_shuffle_epi8(input, shuffle_digits);
 
             using namespace sse;
 

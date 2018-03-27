@@ -117,7 +117,8 @@ class Optimizer(object):
 class BlockInfo(object):
 
     __slots__ = ("id", "image", "first_skip", "total_skip",
-                 "ranges", "element_size", "pshufb_pattern")
+                 "ranges", "element_size", "shuffle_digits",
+                 "shuffle_signs")
 
     def __init__(self, number):
         self.id             = number
@@ -125,17 +126,29 @@ class BlockInfo(object):
         self.total_skip     = 0
         self.ranges         = []
         self.element_size   = 0
-        self.pshufb_pattern = []
+        self.shuffle_digits = []
+        self.shuffle_signs  = []
 
-    def build_pshubf_mask(self):
-        self.pshufb_pattern = [0x80] * 16
+    def build_pshubf_masks(self):
+        self.build_shuffle_digit()
+        self.build_shuffle_signs()
+
+    def build_shuffle_digit(self):
+        self.shuffle_digits = [0x80] * 16
         for element, r in enumerate(self.ranges):
             index  = element * self.element_size
             index += self.element_size - r.digits() # align to "right" within the vector's element
 
             for i in xrange(r.first, r.last + 1):
-                self.pshufb_pattern[index] = i
+                self.shuffle_digits[index] = i
                 index += 1
+    
+    def build_shuffle_signs(self):
+        self.shuffle_signs = [0x80] * 16
+        for element, r in enumerate(self.ranges):
+            index = element * self.element_size
+            for i in xrange(self.element_size):
+                self.shuffle_signs[index + i] = r.first
 
     def __str__(self):
         param = (
@@ -186,7 +199,7 @@ class Generator(object):
                 image = parser.image
                 block.first_skip = image.index(DIGIT)
 
-        block.build_pshubf_mask()
+        block.build_pshubf_masks()
 
         return block
 

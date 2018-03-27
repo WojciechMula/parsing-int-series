@@ -1,4 +1,13 @@
-ITEM_PATTERN = "/* %(ID)04x %(SCALAR_COST)5.2f %(SSE_COST)5.2f */ {%(FIRST_SKIP)s, %(TOTAL_SKIP)s, %(ELEMENT_COUNT)s, %(ELEMENT_SIZE)s, {%(PSHUFB_PATTERN)s}}"
+ITEM_PATTERN = \
+    "/* %(ID)04x %(SCALAR_COST)5.2f %(SSE_COST)5.2f */ {" \
+    "%(FIRST_SKIP)s," \
+    "%(TOTAL_SKIP)s," \
+    "%(ELEMENT_COUNT)s," \
+    "%(ELEMENT_SIZE)s," \
+    "{%(SHUFFLE_DIGITS)s}," \
+    "{%(SHUFFLE_SIGNS)s}" \
+    "}"
+
 FILE_PATTERN = """
 #pragma once
 
@@ -36,7 +45,8 @@ class CPPWriter(object):
             'TOTAL_SKIP'     : block.total_skip,
             'ELEMENT_COUNT'  : len(block.ranges),
             'ELEMENT_SIZE'   : block.element_size,
-            'PSHUFB_PATTERN' : self._make_c_array(block.pshufb_pattern),
+            'SHUFFLE_DIGITS' : self._make_c_array(block.shuffle_digits),
+            'SHUFFLE_SIGNS'  : self._make_c_array(block.shuffle_signs),
             'SCALAR_COST'    : scalar_cost(block).value(),
             'SSE_COST'       : SSE_cost(block).value(),
         }
