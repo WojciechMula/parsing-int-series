@@ -11,7 +11,8 @@ CMDLINE_OBJ=obj/command_line.o \
             obj/input_generator.o \
             obj/application.o
 
-DEPS=include/scalar-parser.h \
+DEPS=include/scalar/scalar-parse-unsigned.h \
+     include/scalar/scalar-parse-signed.h \
      include/hybrid-parser.h \
      include/sse-utils.h \
      include/sse-convert.h \

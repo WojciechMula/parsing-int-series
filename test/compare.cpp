@@ -4,7 +4,7 @@
 #include <cstdlib>
 
 #include "input_generator.h"
-#include "scalar-parser.h"
+#include "scalar/scalar-parse-unsigned.h"
 #include "sse-matcher.h"
 #include "sse-parser-unsigned.h"
 
@@ -32,7 +32,7 @@ bool CompareApp::run() {
     Vector reference;
     Vector result;
     const char* separators = ";, ";
-    scalar_parser(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
+    scalar::parse_unsigned(tmp.data(), tmp.size(), separators, std::back_inserter(reference));
 
     sse::NaiveMatcher<8> matcher(separators);
     sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));

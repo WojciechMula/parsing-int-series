@@ -5,7 +5,7 @@
 #include <cstdlib>
 
 #include "time_utils.h"
-#include "scalar-parser.h"
+#include "scalar/scalar-parse-unsigned.h"
 #include "hybrid-parser.h"
 #include "sse-matcher.h"
 #include "sse-parser-unsigned.h"
@@ -48,8 +48,8 @@ bool BenchmarkApp::run() {
         auto k = get_loop_count();
         while (k--) {
             reference.clear();
-            scalar_parser(tmp.data(), tmp.size(), separators,
-                          std::back_inserter(reference));
+            scalar::parse_unsigned(tmp.data(), tmp.size(), separators,
+                                   std::back_inserter(reference));
         }
     });
 

@@ -59,5 +59,5 @@ void hybrid_parser(const char* string, size_t size, const char* separators, MATC
     } // for
 
     // process the tail
-    scalar_parser(data, string + size - data, separators, output);
+    scalar::parse_unsigned(data, string + size - data, separators, output);
 }

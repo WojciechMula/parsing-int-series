@@ -6,7 +6,8 @@
 #include <cctype>
 
 #include "block_info.h"
-#include "scalar-parser.h"
+#include "scalar/scalar-parse-unsigned.h"
+#include "scalar/scalar-parse-signed.h"
 #include "sse-convert.h"
 #include "sse-matcher.h"
 #include "sse-parser-unsigned.h"
@@ -78,7 +79,7 @@ private:
         std::fill(result.begin(), result.end(), -1);
 
         reference.clear();
-        scalar_parser(buffer, 16, "_", std::back_inserter(reference));
+        scalar::parse_unsigned(buffer, 16, "_", std::back_inserter(reference));
     }
 
     bool compare(size_t n) const {
@@ -195,7 +196,7 @@ private:
         std::fill(result.begin(), result.end(), -1);
 
         reference.clear();
-        scalar_signed_parser(buffer, 16, "_", std::back_inserter(reference));
+        scalar::parse_signed(buffer, 16, "_", std::back_inserter(reference));
     }
 
     bool compare(size_t n) const {

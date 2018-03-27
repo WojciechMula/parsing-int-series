@@ -10,7 +10,7 @@
 #   define SSE_COLLECT_STATISTICS false
 #endif
 
-#include "scalar-parser.h"
+#include "scalar/scalar-parse-unsigned.h"
 #include "sse-utils.h"
 #include "sse-convert.h"
 #include "sse-parser-common.h"
@@ -83,7 +83,7 @@ namespace sse {
         } // for
 
         // process the tail
-        scalar_parser(data, string + size - data, separators, output);
+        scalar::parse_unsigned(data, string + size - data, separators, output);
 
         return stats;
     }
