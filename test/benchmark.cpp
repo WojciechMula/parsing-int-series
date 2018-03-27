@@ -8,7 +8,8 @@
 #include "scalar-parser.h"
 #include "hybrid-parser.h"
 #include "sse-matcher.h"
-#include "sse-parser.h"
+#include "sse-parser-unsigned.h"
+#include "sse-parser-unsigned-unrolled.h"
 
 #include "application.h"
 

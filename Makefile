@@ -16,7 +16,9 @@ DEPS=include/scalar-parser.h \
      include/sse-utils.h \
      include/sse-convert.h \
      include/sse-matcher.h \
-     include/sse-parser.h
+     include/sse-parser-common.h \
+     include/sse-parser-unsigned.h \
+     include/sse-parser-unsigned-unrolled.h
 
 all: $(ALL)
 

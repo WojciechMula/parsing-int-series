@@ -6,7 +6,7 @@
 #include "input_generator.h"
 #include "sse-matcher.h"
 #define SSE_COLLECT_STATISTICS 1
-#include "sse-parser.h"
+#include "sse-parser-unsigned.h"
 
 #include "application.h"
 

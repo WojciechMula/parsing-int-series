@@ -8,7 +8,7 @@
 #include "scalar-parser.h"
 #include "sse-convert.h"
 #include "sse-matcher.h"
-#include "sse-parser.h"
+#include "sse-parser-unsigned.h"
 
 class VerifyConverters {
 
