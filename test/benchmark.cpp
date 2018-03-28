@@ -10,33 +10,55 @@
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
 #include "sse/sse-parser-unsigned-unrolled.h"
+#include "sse/sse-parser-signed.h"
 
 #include "application.h"
 
 class BenchmarkApp: public Application {
 
-    using Vector = std::vector<uint32_t>;
+    using UnsignedVector = std::vector<uint32_t>;
+    using SignedVector = std::vector<int32_t>;
 
 public:
     BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
 
 public:
-    bool run();
+    bool run() {
+        if (has_signed_distribution()) {
+            return run_signed();
+        } else {
+            return run_unsigned();
+        }
+    }
+
+private:
+    bool run_unsigned();
+    bool run_signed();
 
 private:
     std::string tmp;
-    Vector reference;
-    Vector resultScalar2;
-    Vector resultSSE;
-    Vector resultSSEblock;
+
+    struct ResultUnsigned {
+        UnsignedVector reference;
+        UnsignedVector hybrid;
+        UnsignedVector SSE;
+        UnsignedVector SSEblock;
+    } result_unsigned;
+
+    struct ResultSigned {
+        SignedVector reference;
+        SignedVector SSE;
+        SignedVector SSEblock;
+    } result_signed;
 
 private:
-    uint64_t sum(const Vector& vec) const {
+    template <typename T>
+    uint64_t sum(const T& vec) const {
         return std::accumulate(vec.begin(), vec.end(), 0);
     }
 };
 
-bool BenchmarkApp::run() {
+bool BenchmarkApp::run_unsigned() {
 
     printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
 
@@ -47,39 +69,39 @@ bool BenchmarkApp::run() {
     const auto t0 = measure_time("scalar      : ", [this, separators] {
         auto k = get_loop_count();
         while (k--) {
-            reference.clear();
+            result_unsigned.reference.clear();
             scalar::parse_unsigned(tmp.data(), tmp.size(), separators,
-                                   std::back_inserter(reference));
+                                   std::back_inserter(result_unsigned.reference));
         }
     });
 
     const auto t1 = measure_time("hybrid      : ", [this, separators] {
         auto k = get_loop_count();
         while (k--) {
-            resultScalar2.clear();
+            result_unsigned.hybrid.clear();
             sse::NaiveMatcher<8> matcher(separators);
             hybrid_parser(tmp.data(), tmp.size(), separators,
-                          std::move(matcher), std::back_inserter(resultScalar2));
+                          std::move(matcher), std::back_inserter(result_unsigned.hybrid));
         }
     });
 
     const auto t2 = measure_time("SSE         : ", [this, separators] {
         auto k = get_loop_count();
         while (k--) {
-            resultSSE.clear();
+            result_unsigned.SSE.clear();
             sse::NaiveMatcher<8> matcher(separators);
             sse::parser(tmp.data(), tmp.size(), separators,
-                        std::move(matcher), std::back_inserter(resultSSE));
+                        std::move(matcher), std::back_inserter(result_unsigned.SSE));
         }
     });
 
     const auto t3 = measure_time("SSE (block) : ", [this, separators] {
         auto k = get_loop_count();
         while (k--) {
-            resultSSEblock.clear();
+            result_unsigned.SSEblock.clear();
             sse::NaiveMatcher<8> matcher(separators);
             sse::parser_block(tmp.data(), tmp.size(), separators,
-                              std::move(matcher), std::back_inserter(resultSSEblock));
+                              std::move(matcher), std::back_inserter(result_unsigned.SSEblock));
         }
     });
 
@@ -88,13 +110,68 @@ bool BenchmarkApp::run() {
     printf("SSE         speed-up: %0.2f\n", t0 / double(t2));
     printf("SSE (block) speed-up: %0.2f\n", t0 / double(t3));
 
-    const auto s0 = sum(reference);
-    const auto s1 = sum(resultScalar2);
-    const auto s2 = sum(resultSSE);
-    const auto s3 = sum(resultSSEblock);
+    const auto s0 = sum(result_unsigned.reference);
+    const auto s1 = sum(result_unsigned.hybrid);
+    const auto s2 = sum(result_unsigned.SSE);
+    const auto s3 = sum(result_unsigned.SSEblock);
     printf("reference results: %lu %lu %lu %lu\n", s0, s1, s2, s3);
 
     if (s0 == s1 && s0 == s2 && s0 == s3) {
+        return true;
+    } else {
+        puts("FAILED");
+        return false;
+    }
+}
+
+
+bool BenchmarkApp::run_signed() {
+
+    printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
+
+    tmp = generate_signed();
+
+    const char* separators = ";, ";
+
+    const auto t0 = measure_time("scalar      : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.reference.clear();
+            scalar::parse_signed(tmp.data(), tmp.size(), separators,
+                                 std::back_inserter(result_signed.reference));
+        }
+    });
+
+    const auto t1 = measure_time("SSE         : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.SSE.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            sse::parser(tmp.data(), tmp.size(), separators,
+                        std::move(matcher), std::back_inserter(result_signed.SSE));
+        }
+    });
+
+    const auto t2 = measure_time("SSE (block) : ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.SSEblock.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            sse::parser_block(tmp.data(), tmp.size(), separators,
+                              std::move(matcher), std::back_inserter(result_signed.SSEblock));
+        }
+    });
+
+    puts("");
+    printf("SSE         speed-up: %0.2f\n", t0 / double(t1));
+    printf("SSE (block) speed-up: %0.2f\n", t0 / double(t2));
+
+    const auto s0 = sum(result_signed.reference);
+    const auto s1 = sum(result_signed.SSE);
+    const auto s2 = sum(result_signed.SSEblock);
+    printf("reference results: %lu %lu %lu\n", s0, s1, s2);
+
+    if (s0 == s1 && s0 == s2) {
         return true;
     } else {
         puts("FAILED");

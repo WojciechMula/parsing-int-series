@@ -21,12 +21,17 @@ private:
     std::discrete_distribution<> numbers;
     std::discrete_distribution<> separators;
     std::discrete_distribution<> sign;
+    bool sign_nonnull;
 
     std::random_device rd;
     std::mt19937 random;
 
 protected:
     Application(int argc, char* argv[]);
+
+    bool has_signed_distribution() const {
+        return sign_nonnull;
+    }
 
     std::string generate_unsigned();
     std::string generate_signed();

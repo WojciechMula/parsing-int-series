@@ -65,12 +65,16 @@ Application::Application(int argc, char* argv[])
         const auto arr = cmdline.parse_value<std::vector<long>>("--sep", parse_array, {1});
         separators = std::discrete_distribution<>(arr.begin(), arr.end());
     }
-    {
-        const auto arr = cmdline.parse_value<std::vector<long>>("--sign", parse_array, {1, 1, 1});
+
+    if (cmdline.has_value("--sign")) {
+        const auto arr = cmdline.parse_value<std::vector<long>>("--sign", parse_array, {});
         if (arr.size() != 3) {
             throw std::logic_error("--sign expects exactly three-item distribution, like --sign=5,2,1");
         }
         sign = std::discrete_distribution<>(arr.begin(), arr.end());
+        sign_nonnull = true;
+    } else {
+        sign_nonnull = false;
     }
 
 }
@@ -81,6 +85,24 @@ std::string Application::generate_unsigned() {
 
     measure_time("generating random unsigned numbers ", [&tmp, this]{
         tmp = ::generate_unsigned(size, random, numbers, separators);
+    });
+    assert(tmp.size() == size);
+
+    if (debug_size > 0) {
+        printf("first %lu bytes of the data:\n", debug_size);
+        fwrite(tmp.data(), debug_size, 1, stdout);
+        putchar('\n');
+    }
+
+    return tmp;
+}
+
+std::string Application::generate_signed() {
+
+    std::string tmp;
+
+    measure_time("generating random signed numbers ", [&tmp, this]{
+        tmp = ::generate_signed(size, random, numbers, separators, sign);
     });
     assert(tmp.size() == size);
 
