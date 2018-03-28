@@ -53,12 +53,9 @@ namespace sse {
 
             const uint16_t span_mask = sign_mask | digit_mask;
             const BlockInfo& bi = blocks[span_mask];
-            // TODO: validate bytemask_sign against precalculate mask
-            /*
-                if (sign_mask & bi.invalid_sign_mask) {
-                    throw std::runtime_error("'+' or '-' at invalid position");
-                }
-            */
+            if (sign_mask & bi.invalid_sign_mask) {
+                throw std::runtime_error("'+' or '-' at invalid position");
+            }
 
             if (span_mask == 0) {
                 data += 16;

@@ -19,7 +19,8 @@ DEPS=include/scalar/scalar-parse-unsigned.h \
      include/sse/sse-matcher.h \
      include/sse/sse-parser-common.h \
      include/sse/sse-parser-unsigned.h \
-     include/sse/sse-parser-unsigned-unrolled.h
+     include/sse/sse-parser-unsigned-unrolled.h \
+     include/sse/sse-parser-signed.h
 
 all: $(ALL)
 

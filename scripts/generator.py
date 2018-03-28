@@ -56,10 +56,16 @@ class Parser(object):
                 # Note: a digits span which not ends within the chunk
                 #       doesn't appear in the result (we don't know how to parse it)
                 ranges.append(DigitsSpan(start, i - 1))
+                start = None
 
             prev = c
 
-        return ranges
+        if start is not None:
+            incomplete = DigitsSpan(start, 15)
+        else:
+            incomplete = None
+
+        return (ranges, incomplete)
 
 
     def __convert_to_string(self, x):
@@ -117,17 +123,18 @@ class Optimizer(object):
 class BlockInfo(object):
 
     __slots__ = ("id", "image", "first_skip", "total_skip",
-                 "ranges", "element_size", "shuffle_digits",
+                 "ranges", "incomplete_span", "element_size", "shuffle_digits",
                  "shuffle_signs")
 
     def __init__(self, number):
-        self.id             = number
-        self.first_skip     = 0
-        self.total_skip     = 0
-        self.ranges         = []
-        self.element_size   = 0
-        self.shuffle_digits = []
-        self.shuffle_signs  = []
+        self.id              = number
+        self.first_skip      = 0
+        self.total_skip      = 0
+        self.ranges          = []
+        self.incomplete_span = None
+        self.element_size    = 0
+        self.shuffle_digits  = []
+        self.shuffle_signs   = []
 
     def build_pshubf_masks(self):
         self.build_shuffle_digit()
@@ -149,6 +156,23 @@ class BlockInfo(object):
             index = element * self.element_size
             for i in xrange(self.element_size):
                 self.shuffle_signs[index + i] = r.first
+
+    def get_invalid_sign_mask(self):
+        result = 0
+        for r in self.ranges:
+            if r.digits() <= 1:
+                continue
+
+            # only first character of span might be '+' or '-'
+            bit = 1 << r.first
+            result |= bit
+
+        # take into consideration the last span
+        if self.incomplete_span is not None:
+            bit = 1 >> self.incomplete_span.first
+            result |= bit
+
+        return result
 
     def __str__(self):
         param = (
@@ -173,7 +197,7 @@ class Generator(object):
 
     def __get_structure(self, number):
         parser = Parser(number)
-        ranges = parser.get_ranges()
+        ranges, incomplte_span = parser.get_ranges()
 
         opt = Optimizer(ranges)
         ret = opt.get_best()
