@@ -22,7 +22,7 @@ public:
 
 void StatisticsApp::run() {
 
-    const auto tmp = generate();
+    const auto tmp = generate_unsigned();
 
     const char* separators = ",; ";
     sse::NaiveMatcher<8> matcher(separators);

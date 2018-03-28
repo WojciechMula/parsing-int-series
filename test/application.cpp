@@ -65,14 +65,21 @@ Application::Application(int argc, char* argv[])
         const auto arr = cmdline.parse_value<std::vector<long>>("--sep", parse_array, {1});
         separators = std::discrete_distribution<>(arr.begin(), arr.end());
     }
+    {
+        const auto arr = cmdline.parse_value<std::vector<long>>("--sign", parse_array, {1, 1, 1});
+        if (arr.size() != 3) {
+            throw std::logic_error("--sign expects exactly three-item distribution, like --sign=5,2,1");
+        }
+        sign = std::discrete_distribution<>(arr.begin(), arr.end());
+    }
 
 }
 
-std::string Application::generate() {
+std::string Application::generate_unsigned() {
 
     std::string tmp;
 
-    measure_time("generating random data ", [&tmp, this]{
+    measure_time("generating random unsigned numbers ", [&tmp, this]{
         tmp = ::generate_unsigned(size, random, numbers, separators);
     });
     assert(tmp.size() == size);
@@ -96,7 +103,12 @@ void Application::print_help() const {
     puts("--seed=NUMBER         seed for random number generator [default: 0]");
     puts("--num=DISTRIBUTION    distribution of lengths of numbers");
     puts("--sep=DISTRIBUTION    distribution of lengths of gaps between numbers [default: '1']");
+    puts("--sign=DISTRIBUTION   distribution of sign in front of number [default: '1']");
     puts("--debug=K             prints K first bytes of generated input [default: 0]");
+    puts("");
+    puts("Distribution is given as a list of comma-separated values.");
+    puts("For --num and --sep the list length is unbound, for --sign it");
+    puts("must have exactly three items.");
 }
 
 

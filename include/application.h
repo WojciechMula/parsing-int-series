@@ -20,6 +20,7 @@ private:
     size_t loop_count;
     std::discrete_distribution<> numbers;
     std::discrete_distribution<> separators;
+    std::discrete_distribution<> sign;
 
     std::random_device rd;
     std::mt19937 random;
@@ -27,7 +28,8 @@ private:
 protected:
     Application(int argc, char* argv[]);
 
-    std::string generate();
+    std::string generate_unsigned();
+    std::string generate_signed();
 
 public:
     size_t get_size() const {

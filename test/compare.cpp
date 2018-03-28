@@ -27,7 +27,7 @@ private:
 
 bool CompareApp::run() {
 
-    const auto tmp = generate();
+    const auto tmp = generate_unsigned();
 
     Vector reference;
     Vector result;

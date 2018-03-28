@@ -40,7 +40,7 @@ bool BenchmarkApp::run() {
 
     printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
 
-    tmp = generate();
+    tmp = generate_unsigned();
 
     const char* separators = ";, ";
 
