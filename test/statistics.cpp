@@ -4,9 +4,9 @@
 #include <cstdlib>
 
 #include "input_generator.h"
-#include "sse-matcher.h"
+#include "sse/sse-matcher.h"
 #define SSE_COLLECT_STATISTICS 1
-#include "sse-parser-unsigned.h"
+#include "sse/sse-parser-unsigned.h"
 
 #include "application.h"
 

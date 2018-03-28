@@ -8,9 +8,9 @@
 #include "block_info.h"
 #include "scalar/scalar-parse-unsigned.h"
 #include "scalar/scalar-parse-signed.h"
-#include "sse-convert.h"
-#include "sse-matcher.h"
-#include "sse-parser-unsigned.h"
+#include "sse/sse-convert.h"
+#include "sse/sse-matcher.h"
+#include "sse/sse-parser-unsigned.h"
 
 class VerifyUnsignedConverters {
 

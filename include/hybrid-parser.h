@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <immintrin.h>
-#include "sse-utils.h"
+#include "sse/sse-utils.h"
 
 namespace scalar {
 

@@ -5,8 +5,8 @@
 
 #include "input_generator.h"
 #include "scalar/scalar-parse-unsigned.h"
-#include "sse-matcher.h"
-#include "sse-parser-unsigned.h"
+#include "sse/sse-matcher.h"
+#include "sse/sse-parser-unsigned.h"
 
 #include "application.h"
 

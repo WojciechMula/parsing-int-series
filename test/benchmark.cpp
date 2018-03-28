@@ -7,9 +7,9 @@
 #include "time_utils.h"
 #include "scalar/scalar-parse-unsigned.h"
 #include "hybrid-parser.h"
-#include "sse-matcher.h"
-#include "sse-parser-unsigned.h"
-#include "sse-parser-unsigned-unrolled.h"
+#include "sse/sse-matcher.h"
+#include "sse/sse-parser-unsigned.h"
+#include "sse/sse-parser-unsigned-unrolled.h"
 
 #include "application.h"
 
