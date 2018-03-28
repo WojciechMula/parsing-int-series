@@ -73,7 +73,7 @@ std::string Application::generate() {
     std::string tmp;
 
     measure_time("generating random data ", [&tmp, this]{
-        tmp = ::generate(size, random, numbers, separators);
+        tmp = ::generate_unsigned(size, random, numbers, separators);
     });
     assert(tmp.size() == size);
 
