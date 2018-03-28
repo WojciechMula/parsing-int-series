@@ -5,8 +5,8 @@
 
 #include "input_generator.h"
 #include "sse/sse-matcher.h"
-#define SSE_COLLECT_STATISTICS 1
 #include "sse/sse-parser-unsigned.h"
+#include "sse/sse-parser-signed.h"
 
 #include "application.h"
 
@@ -18,17 +18,40 @@ public:
     StatisticsApp(int argc, char** argv) : Application(argc, argv) {}
     
     void run();
+
+private:
+    void run_unsigned();
+    void run_signed();
 };
 
 void StatisticsApp::run() {
+    if (has_signed_distribution()) {
+        run_signed();
+    } else {
+        run_unsigned();
+    }
+}
+
+void StatisticsApp::run_unsigned() {
 
     const auto tmp = generate_unsigned();
 
     const char* separators = ",; ";
     sse::NaiveMatcher<8> matcher(separators);
     std::vector<uint32_t> result;
-    const auto stats = sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
-    stats.print();
+    sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+    sse::stats.print();
+}
+
+void StatisticsApp::run_signed() {
+
+    const auto tmp = generate_signed();
+
+    const char* separators = ",; ";
+    sse::NaiveMatcher<8> matcher(separators);
+    std::vector<int32_t> result;
+    sse::parser_signed(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
+    sse::stats.print();
 }
 
 int main(int argc, char* argv[]) {

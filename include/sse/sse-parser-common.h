@@ -12,8 +12,8 @@ namespace sse {
 
     namespace detail {
 
-        template <typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
-        char* parse_unsigned(const BlockInfo& bi, const __m128i input, char* data, char* end, Statistics& stats, INSERTER output) {
+        template <typename INSERTER>
+        char* parse_unsigned(const BlockInfo& bi, const __m128i input, char* data, char* end, INSERTER output) {
 
             const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)bi.shuffle_digits);
             const __m128i shuffled = _mm_shuffle_epi8(input, shuffle_digits);
@@ -21,34 +21,30 @@ namespace sse {
             if (bi.element_size == 1) {
 
                 convert_1digit(shuffled, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit1_calls += 1;
-                    stats.digit1_conversion += bi.element_count;
-                }
+
+                STATS_INC(unsigned_path.digit1_calls);
+                STATS_ADD(unsigned_path.digit1_converted, bi.element_count);
 
             } else if (bi.element_size == 2) {
 
                 convert_2digits(shuffled, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit2_calls += 1;
-                    stats.digit2_conversion += bi.element_count;
-                }
+
+                STATS_INC(unsigned_path.digit2_calls);
+                STATS_ADD(unsigned_path.digit2_converted, bi.element_count);
 
             } else if (bi.element_size == 4) {
 
                 convert_4digits(shuffled, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit4_calls += 1;
-                    stats.digit4_conversion += bi.element_count;
-                }
+
+                STATS_INC(unsigned_path.digit4_calls);
+                STATS_ADD(unsigned_path.digit4_converted, bi.element_count);
 
             } else if (bi.element_size == 8) {
 
                 convert_8digits(shuffled, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit8_calls += 1;
-                    stats.digit8_conversion += bi.element_count;
-                }
+
+                STATS_INC(unsigned_path.digit8_calls);
+                STATS_ADD(unsigned_path.digit8_converted, bi.element_count);
 
             } else {
                 uint32_t result = 0;
@@ -64,28 +60,25 @@ namespace sse {
                     *output++ = result;
                 }
 
-                if (collect_statistics) {
-                    stats.scalar_conversions += 1;
-                }
+                STATS_INC(unsigned_path.scalar_conversions);
 
                 return data;
             }
 
-            if (collect_statistics) {
-                stats.total_skip_histogram[bi.total_skip] += 1;
-            }
+#ifdef USE_STATISTICS
+            stats.total_skip_histogram[bi.total_skip] += 1;
+#endif
 
             return data + bi.total_skip;
         }
 
-        template <typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
+        template <typename INSERTER>
         char* parse_signed(
             const BlockInfo& bi,
             const __m128i input,
             const __m128i bytemask_sign,
             char* data,
             char* end,
-            Statistics& stats,
             INSERTER output
         ) {
             const __m128i ascii_minus = _mm_set1_epi8('-');
@@ -105,26 +98,23 @@ namespace sse {
             } else if (bi.element_size == 2) {
 
                 convert_2digits_signed(shuffled, negate_mask, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit2_calls += 1;
-                    stats.digit2_conversion += bi.element_count;
-                }
+
+                STATS_INC(signed_path.digit2_calls);
+                STATS_ADD(signed_path.digit2_converted, bi.element_count);
 
             } else if (bi.element_size == 4) {
 
                 convert_4digits_signed(shuffled, negate_mask, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit4_calls += 1;
-                    stats.digit4_conversion += bi.element_count;
-                }
+
+                STATS_INC(signed_path.digit4_calls);
+                STATS_ADD(signed_path.digit4_converted, bi.element_count);
 
             } else if (bi.element_size == 8) {
 
                 convert_8digits_signed(shuffled, negate_mask, bi.element_count, output);
-                if (collect_statistics) {
-                    stats.digit8_calls += 1;
-                    stats.digit8_conversion += bi.element_count;
-                }
+
+                STATS_INC(signed_path.digit8_calls);
+                STATS_ADD(signed_path.digit8_converted, bi.element_count);
 
             } else {
                 bool converted = false;
@@ -161,16 +151,14 @@ namespace sse {
                     }
                 }
 
-                if (collect_statistics) {
-                    stats.scalar_conversions += 1;
-                }
+                STATS_INC(signed_path.scalar_conversions);
 
                 return data;
             }
 
-            if (collect_statistics) {
-                stats.total_skip_histogram[bi.total_skip] += 1;
-            }
+#ifdef USE_STATISTICS
+            stats.total_skip_histogram[bi.total_skip] += 1;
+#endif
 
             return data + bi.total_skip;
         }

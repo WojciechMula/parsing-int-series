@@ -6,6 +6,7 @@ FLAGS:=$(FLAGS) -Iinclude
 ALL=compare verify benchmark statistics
 
 OBJ=obj/block_info.o \
+    obj/sse-parser-statistics.o
 
 CMDLINE_OBJ=obj/command_line.o \
             obj/input_generator.o \
@@ -30,11 +31,11 @@ compare: test/compare.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
 verify: test/verify.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
 
-STATISTICS_OBJ=$(OBJ) $(CMDLINE_OBJ) obj/sse-parser-statistics.o
+STATISTICS_OBJ=$(OBJ) $(CMDLINE_OBJ)
 statistics: test/statistics.cpp $(DEPS) $(STATISTICS_OBJ)
-	$(CXX) $(FLAGS) $< $(STATISTICS_OBJ) -o $@
+	$(CXX) $(FLAGS) -DUSE_STATISTICS $< $(STATISTICS_OBJ) -o $@
 
-BENCHMARK_OBJ=$(OBJ) $(CMDLINE_OBJ) obj/sse-parser-statistics.o
+BENCHMARK_OBJ=$(OBJ) $(CMDLINE_OBJ)
 benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h include/hybrid-parser.inl $(BENCHMARK_OBJ)
 	$(CXX) $(FLAGS) $< $(BENCHMARK_OBJ) -o $@
 
@@ -50,7 +51,7 @@ obj/application.o: test/application.cpp include/application.h include/command_li
 obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
-obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp
+obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp include/sse/sse-parser-statistics.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 src/block_info.inl: scripts/generator.py scripts/writer.py

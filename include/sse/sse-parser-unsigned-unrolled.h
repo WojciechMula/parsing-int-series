@@ -3,13 +3,6 @@
 #include <vector>
 #include <cassert>
 
-#ifdef SSE_COLLECT_STATISTICS
-#   undef SSE_COLLECT_STATISTICS
-#   define SSE_COLLECT_STATISTICS true
-#else
-#   define SSE_COLLECT_STATISTICS false
-#endif
-
 #include "scalar/scalar-parse-unsigned.h"
 #include "sse-utils.h"
 #include "sse-convert.h"
@@ -19,10 +12,8 @@
 
 namespace sse {
 
-    template <typename MATCHER, typename INSERTER, bool collect_statistics = SSE_COLLECT_STATISTICS>
-    Statistics parser_block(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
-
-        Statistics stats;
+    template <typename MATCHER, typename INSERTER>
+    void parser_block(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
 
         char* data = const_cast<char*>(string);
         char* end  = data + size;
@@ -49,7 +40,7 @@ namespace sse {
                                       | (valid_mask2 << (2*16))
                                       | (valid_mask3 << (3*16));
 
-            if (collect_statistics) stats.loops += 1;
+            STATS_INC(loops);
 
             if (valid_mask != uint64_t(-1)) {
                 throw std::runtime_error("Wrong character");
@@ -71,7 +62,7 @@ namespace sse {
             while (data < loopend) {
                 char* prevdata = data;
                 const BlockInfo& bi = blocks[mask & 0xffff];
-                data = detail::parse_unsigned(bi, input, data, end, stats, output);
+                data = detail::parse_unsigned(bi, input, data, end, output);
                 if (data == end) {
                     break;
                 }
@@ -85,8 +76,6 @@ namespace sse {
 
         // process the tail
         scalar::parse_unsigned(data, string + size - data, separators, output);
-
-        return stats;
     }
 
 } // namespace sse
