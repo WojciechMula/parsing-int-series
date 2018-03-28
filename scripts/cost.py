@@ -69,35 +69,35 @@ def SSE_cost(bi):
 
     if bi.element_size == 1:
         cost.add_sub += 1
-        cost.load += len(bi.ranges)
+        cost.load += len(bi.spans)
 
     elif bi.element_size == 2:
         cost.add_sub += 1
         cost.multiplication += 1
-        cost.load += len(bi.ranges)
+        cost.load += len(bi.spans)
 
     elif bi.element_size == 4:
         cost.add_sub += 1
         cost.multiplication += 2
         cost.pack += 1
-        cost.load += len(bi.ranges)
+        cost.load += len(bi.spans)
 
     elif bi.element_size == 8:
         cost.add_sub += 1
         cost.multiplication += 3
         cost.pack += 1
-        cost.load += len(bi.ranges)
+        cost.load += len(bi.spans)
 
     else:
         cost.compare = 100000
 
-    cost.store = len(bi.ranges)
+    cost.store = len(bi.spans)
 
     return cost
 
 
 def is_profitable(bi):
-    if len(bi.ranges) == 0:
+    if len(bi.spans) == 0:
         return False
 
     scalar = scalar_cost(bi)

@@ -42,10 +42,10 @@ class Parser(object):
         self.image = self.__convert_to_string(number)
 
 
-    def get_ranges(self):
+    def get_spans(self):
         prev  = SPACE
         start = None
-        ranges = []
+        spans = []
         for i, c in enumerate(self.image):
             if c == prev:
                 continue
@@ -55,7 +55,7 @@ class Parser(object):
             else:
                 # Note: a digits span which not ends within the chunk
                 #       doesn't appear in the result (we don't know how to parse it)
-                ranges.append(DigitsSpan(start, i - 1))
+                spans.append(DigitsSpan(start, i - 1))
                 start = None
 
             prev = c
@@ -65,7 +65,7 @@ class Parser(object):
         else:
             incomplete = None
 
-        return (ranges, incomplete)
+        return (spans, incomplete)
 
 
     def __convert_to_string(self, x):
@@ -80,8 +80,8 @@ class Parser(object):
 
 
 class Optimizer(object):
-    def __init__(self, ranges):
-        self.ranges = ranges
+    def __init__(self, spans):
+        self.spans = spans
 
 
     def get_best(self):
@@ -106,7 +106,7 @@ class Optimizer(object):
     def __pack(self, element_size, vector_size = 16):
         max_size = vector_size / element_size
         result = []
-        for r in self.ranges:
+        for r in self.spans:
             if r.digits() <= element_size:
                 result.append(r)
                 if len(result) == max_size:
@@ -123,14 +123,14 @@ class Optimizer(object):
 class BlockInfo(object):
 
     __slots__ = ("id", "image", "first_skip", "total_skip",
-                 "ranges", "incomplete_span", "element_size", "shuffle_digits",
+                 "spans", "incomplete_span", "element_size", "shuffle_digits",
                  "shuffle_signs")
 
     def __init__(self, number):
         self.id              = number
         self.first_skip      = 0
         self.total_skip      = 0
-        self.ranges          = []
+        self.spans           = []
         self.incomplete_span = None
         self.element_size    = 0
         self.shuffle_digits  = []
@@ -142,7 +142,7 @@ class BlockInfo(object):
 
     def build_shuffle_digit(self):
         self.shuffle_digits = [0x80] * 16
-        for element, r in enumerate(self.ranges):
+        for element, r in enumerate(self.spans):
             index  = element * self.element_size
             index += self.element_size - r.digits() # align to "right" within the vector's element
 
@@ -152,14 +152,14 @@ class BlockInfo(object):
     
     def build_shuffle_signs(self):
         self.shuffle_signs = [0x80] * 16
-        for element, r in enumerate(self.ranges):
+        for element, r in enumerate(self.spans):
             index = element * self.element_size
             for i in xrange(self.element_size):
                 self.shuffle_signs[index + i] = r.first
 
     def get_invalid_sign_mask(self):
         result = 0
-        for r in self.ranges:
+        for r in self.spans:
             if r.digits() <= 1:
                 continue
 
@@ -180,11 +180,11 @@ class BlockInfo(object):
             self.first_skip,
             self.total_skip,
             self.element_size,
-            self.ranges
+            self.spans
         )
 
         return "<BlockInfo#%04x {first_skip=%d, total_skip=%d, " \
-               "element_size=%d, ranges=%s}>" % param
+               "element_size=%d, spans=%s}>" % param
 
 
 class Generator(object):
@@ -197,18 +197,19 @@ class Generator(object):
 
     def __get_structure(self, number):
         parser = Parser(number)
-        ranges, incomplte_span = parser.get_ranges()
+        spans, incomplete_span = parser.get_spans()
 
-        opt = Optimizer(ranges)
+        opt = Optimizer(spans)
         ret = opt.get_best()
 
         block = BlockInfo(number)
         block.image = parser.image
+        block.incomplete_span = incomplete_span
         if ret is not None:
             element_size, items = ret
 
             block.first_skip   = items[0].first
-            block.ranges       = items
+            block.spans        = items
             block.element_size = element_size
 
             block.total_skip = items[-1].last + 1

@@ -44,7 +44,7 @@ class CPPWriter(object):
             'ID'                : block.id,
             'FIRST_SKIP'        : block.first_skip,
             'TOTAL_SKIP'        : block.total_skip,
-            'ELEMENT_COUNT'     : len(block.ranges),
+            'ELEMENT_COUNT'     : len(block.spans),
             'ELEMENT_SIZE'      : block.element_size,
             'INVALID_SIGN_MASK' : block.get_invalid_sign_mask(),
             'SHUFFLE_DIGITS'    : self._make_c_array(block.shuffle_digits),
