@@ -96,7 +96,7 @@ namespace sse {
             const __m128i digits         = _mm_andnot_si128(bytemask_sign, input);
             const __m128i shuffled       = _mm_shuffle_epi8(digits, shuffle_digits);
             const __m128i shuffled_signs = _mm_shuffle_epi8(input, shuffle_signs);
-            const __m128i negate_mask    = _mm_cmpeq_epi8(shuffle_signs, ascii_minus);
+            const __m128i negate_mask    = _mm_cmpeq_epi8(shuffled_signs, ascii_minus);
 
             if (bi.element_size == 1) {
 

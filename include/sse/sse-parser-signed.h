@@ -10,7 +10,6 @@
 #   define SSE_COLLECT_STATISTICS false
 #endif
 
-
 #include "scalar/scalar-parse-signed.h"
 #include "sse-utils.h"
 #include "sse-convert.h"
@@ -41,13 +40,13 @@ namespace sse {
             const __m128i bytemask_plus  = _mm_cmpeq_epi8(input, ascii_plus);
             const __m128i bytemask_minus = _mm_cmpeq_epi8(input, ascii_minus);
             const __m128i bytemask_sign  = _mm_or_si128(bytemask_plus, bytemask_minus);
-
             const __m128i bytemask_span  = _mm_or_si128(bytemask_digit, bytemask_sign);
+
             const uint16_t sign_mask     = _mm_movemask_epi8(bytemask_sign);
             const uint16_t digit_mask    = _mm_movemask_epi8(bytemask_digit);
             const uint16_t valid_mask    = _mm_movemask_epi8(matcher.get_mask(input, bytemask_span));
 
-            if (valid_mask | sign_mask != 0xffff) {
+            if ((valid_mask | sign_mask) != 0xffff) {
                 throw std::runtime_error("Wrong character");
             }
 
@@ -66,7 +65,7 @@ namespace sse {
 
             if (sign_mask == 0 || bi.element_size == 1) {
                 // unsigned path
-                data = detail::parse_unsigned(digit_mask, input, data, end, stats, output);
+                data = detail::parse_unsigned(bi, input, data, end, stats, output);
             } else {
                 data = detail::parse_signed(bi, input, bytemask_sign, data, end, stats, output);
             }
