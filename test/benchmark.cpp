@@ -48,7 +48,6 @@ private:
     struct ResultSigned {
         SignedVector reference;
         SignedVector SSE;
-        SignedVector SSEblock;
     } result_signed;
 
 private:
@@ -147,31 +146,19 @@ bool BenchmarkApp::run_signed() {
         while (k--) {
             result_signed.SSE.clear();
             sse::NaiveMatcher<8> matcher(separators);
-            sse::parser(tmp.data(), tmp.size(), separators,
-                        std::move(matcher), std::back_inserter(result_signed.SSE));
-        }
-    });
-
-    const auto t2 = measure_time("SSE (block) : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_signed.SSEblock.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_block(tmp.data(), tmp.size(), separators,
-                              std::move(matcher), std::back_inserter(result_signed.SSEblock));
+            sse::parser_signed(tmp.data(), tmp.size(), separators,
+                               std::move(matcher), std::back_inserter(result_signed.SSE));
         }
     });
 
     puts("");
     printf("SSE         speed-up: %0.2f\n", t0 / double(t1));
-    printf("SSE (block) speed-up: %0.2f\n", t0 / double(t2));
 
     const auto s0 = sum(result_signed.reference);
     const auto s1 = sum(result_signed.SSE);
-    const auto s2 = sum(result_signed.SSEblock);
-    printf("reference results: %lu %lu %lu\n", s0, s1, s2);
+    printf("reference results: %lu %lu\n", s0, s1);
 
-    if (s0 == s1 && s0 == s2) {
+    if (s0 == s1) {
         return true;
     } else {
         puts("FAILED");
