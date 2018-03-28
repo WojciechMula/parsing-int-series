@@ -48,7 +48,8 @@ namespace sse {
                 continue;
             }
 
-            data = detail::parse(digit_mask, input, data, end, stats, output);
+            const BlockInfo& bi = blocks[digit_mask];
+            data = detail::parse_unsigned(bi, input, data, end, stats, output);
 
         } // for
 

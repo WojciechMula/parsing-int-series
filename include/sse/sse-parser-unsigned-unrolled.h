@@ -70,7 +70,8 @@ namespace sse {
             char* loopend = data + 3*16;
             while (data < loopend) {
                 char* prevdata = data;
-                data = detail::parse(mask & 0xffff, input, data, end, stats, output);
+                const BlockInfo& bi = blocks[mask & 0xffff];
+                data = detail::parse_unsigned(bi, input, data, end, stats, output);
                 if (data == end) {
                     break;
                 }
