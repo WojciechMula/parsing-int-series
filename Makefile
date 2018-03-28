@@ -34,8 +34,9 @@ STATISTICS_OBJ=$(OBJ) $(CMDLINE_OBJ) obj/sse-parser-statistics.o
 statistics: test/statistics.cpp $(DEPS) $(STATISTICS_OBJ)
 	$(CXX) $(FLAGS) $< $(STATISTICS_OBJ) -o $@
 
-benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h $(OBJ) $(CMDLINE_OBJ) include/hybrid-parser.inl
-	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
+BENCHMARK_OBJ=$(OBJ) $(CMDLINE_OBJ) obj/sse-parser-statistics.o
+benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h include/hybrid-parser.inl $(BENCHMARK_OBJ)
+	$(CXX) $(FLAGS) $< $(BENCHMARK_OBJ) -o $@
 
 obj/input_generator.o: test/input_generator.cpp include/input_generator.h
 	$(CXX) $(FLAGS) $< -c -o $@
