@@ -30,6 +30,11 @@ class DigitsSpan(object):
             return 8
         return 16;
 
+    def __str__(self):
+        return "<%d,%d>" % (self.first, self.last)
+
+    __repr__ = __str__
+
 DIGIT = 'd'
 SPACE = '_'
 
@@ -61,9 +66,9 @@ class Parser(object):
             prev = c
 
         if start is not None:
-            incomplete = DigitsSpan(start, 15)
+            incomplete = [DigitsSpan(start, 15)]
         else:
-            incomplete = None
+            incomplete = []
 
         return (spans, incomplete)
 
@@ -123,7 +128,7 @@ class Optimizer(object):
 class BlockInfo(object):
 
     __slots__ = ("id", "image", "first_skip", "total_skip",
-                 "spans", "incomplete_span", "element_size", "shuffle_digits",
+                 "spans", "all_spans", "element_size", "shuffle_digits",
                  "shuffle_signs")
 
     def __init__(self, number):
@@ -131,7 +136,7 @@ class BlockInfo(object):
         self.first_skip      = 0
         self.total_skip      = 0
         self.spans           = []
-        self.incomplete_span = None
+        self.all_spans       = []
         self.element_size    = 0
         self.shuffle_digits  = []
         self.shuffle_signs   = []
@@ -159,7 +164,7 @@ class BlockInfo(object):
 
     def get_invalid_sign_mask(self):
         result = 0
-        for r in self.spans:
+        for r in self.all_spans:
             if r.digits() <= 1:
                 continue
 
@@ -167,12 +172,12 @@ class BlockInfo(object):
             bit = 1 << r.first
             result |= bit
 
-        # take into consideration the last span
-        if self.incomplete_span is not None:
-            bit = 1 >> self.incomplete_span.first
-            result |= bit
+        # if last span has just one char it might also be a sign
+        if self.all_spans and self.all_spans[-1].last == 15:
+            result |= 0x8000
 
-        return result
+        # negate result, to avoid negation in runtime
+        return ~result & 0xffff
 
     def __str__(self):
         param = (
@@ -204,7 +209,7 @@ class Generator(object):
 
         block = BlockInfo(number)
         block.image = parser.image
-        block.incomplete_span = incomplete_span
+        block.all_spans = spans + incomplete_span
         if ret is not None:
             element_size, items = ret
 
