@@ -3,6 +3,7 @@
 #include "input_generator.h"
 #include "time_utils.h"
 
+#include <set>
 #include <cassert>
 
 namespace {
@@ -34,6 +35,33 @@ namespace {
         return result;
     }
 
+    std::string parse_separators(const std::string& s) {
+        std::set<char> set;
+        static const std::string reserved_chars{"0123456789+-"};
+
+        for (char c: s) {
+            set.insert(c);
+        }
+
+        const bool empty     = set.empty();
+        const bool too_large = set.size() > 16;
+        bool invalid_chars = false;
+        for (char c: reserved_chars) {
+            if (set.count(c)) {
+                invalid_chars = true;
+                break;
+            }
+        }
+
+        if (empty || too_large || invalid_chars) {
+            throw Application::ArgumentError
+                    ("Separators must be a non empty, up to 16 chars set; "
+                     "forbidden chars are: '0'..'9', '+' and '-'.");
+        }
+
+        return std::string{set.begin(), set.end()};
+    }
+
 }
 
 Application::Application(int argc, char* argv[])
@@ -50,9 +78,11 @@ Application::Application(int argc, char* argv[])
         return std::stol(val);
     };
 
-    size        = cmdline.parse_value<size_t>("--size", to_int);
-    debug_size  = cmdline.parse_value<size_t>("--debug", to_int, 0);
-    loop_count  = cmdline.parse_value<size_t>("--loops", to_int, 1);
+    size            = cmdline.parse_value<size_t>("--size", to_int);
+    debug_size      = cmdline.parse_value<size_t>("--debug", to_int, 0);
+    loop_count      = cmdline.parse_value<size_t>("--loops", to_int, 1);
+    separators_set  = cmdline.parse_value<std::string>("--separators", parse_separators, ",; ");
+    printf("'%s'\n", separators_set.c_str());
 
     const auto seed = cmdline.parse_value("--seed", to_int, 0);
     random.seed(seed);
@@ -84,7 +114,7 @@ std::string Application::generate_unsigned() {
     std::string tmp;
 
     measure_time("generating random unsigned numbers ", [&tmp, this]{
-        tmp = ::generate_unsigned(size, random, numbers, separators);
+        tmp = ::generate_unsigned(size, get_separators_set(), random, numbers, separators);
     });
     assert(tmp.size() == size);
 
@@ -102,7 +132,7 @@ std::string Application::generate_signed() {
     std::string tmp;
 
     measure_time("generating random signed numbers ", [&tmp, this]{
-        tmp = ::generate_signed(size, random, numbers, separators, sign);
+        tmp = ::generate_signed(size, get_separators_set(), random, numbers, separators, sign);
     });
     assert(tmp.size() == size);
 
@@ -125,6 +155,7 @@ void Application::print_help() const {
     puts("--seed=NUMBER         seed for random number generator [default: 0]");
     puts("--num=DISTRIBUTION    distribution of lengths of numbers");
     puts("--sep=DISTRIBUTION    distribution of lengths of gaps between numbers [default: '1']");
+    puts("--separators=string   list of separator characters [default: \",; \"");
     puts("--sign=DISTRIBUTION   distribution of sign in front of number [default: '1']");
     puts("--debug=K             prints K first bytes of generated input [default: 0]");
     puts("");

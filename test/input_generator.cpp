@@ -2,8 +2,7 @@
 
 #include <cassert>
 
-static const std::string numbers    = "0123456789";
-static const std::string separators = ",; ";
+static const std::string numbers = "0123456789";
 
 static
 std::string random_string(size_t n, const std::string& set) {
@@ -17,6 +16,7 @@ std::string random_string(size_t n, const std::string& set) {
 }
 
 std::string generate_unsigned(size_t size,
+                              const std::string& separators_set,
                               std::mt19937 random,
                               std::discrete_distribution<> num,
                               std::discrete_distribution<> sep) {
@@ -28,19 +28,20 @@ std::string generate_unsigned(size_t size,
         const size_t k = sep(random) + 1;
 
         const std::string number = random_string(n, numbers);
-        const std::string sep    = random_string(k, separators);
+        const std::string sep    = random_string(k, separators_set);
 
         if (result.size() + n + k < size) {
             result += number;
             result += sep;
         } else {
-            result += random_string(size - result.size(), separators);
+            result += random_string(size - result.size(), separators_set);
             return result;
         }
     }
 }
 
 std::string generate_signed(size_t size,
+                            const std::string& separators_set,
                             std::mt19937 random,
                             std::discrete_distribution<> num,
                             std::discrete_distribution<> sep,
@@ -54,7 +55,7 @@ std::string generate_signed(size_t size,
         const size_t s = sign(random) % 3;
 
         const std::string number = random_string(n, numbers);
-        const std::string sep    = random_string(k, separators);
+        const std::string sep    = random_string(k, separators_set);
 
         if (result.size() + n + k + s < size) {
             switch (s) {
@@ -72,7 +73,7 @@ std::string generate_signed(size_t size,
             result += number;
             result += sep;
         } else {
-            result += random_string(size - result.size(), separators);
+            result += random_string(size - result.size(), separators_set);
             return result;
         }
     }

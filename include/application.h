@@ -11,6 +11,10 @@ class Application {
 
 public:
     class Exit {};
+    class ArgumentError: public std::logic_error {
+    public:
+        ArgumentError(const std::string& msg) : std::logic_error(msg) {}
+    };
 
 private:
     CommandLine cmdline;
@@ -22,6 +26,7 @@ private:
     std::discrete_distribution<> separators;
     std::discrete_distribution<> sign;
     bool sign_nonnull;
+    std::string separators_set;
 
     std::random_device rd;
     std::mt19937 random;
@@ -33,6 +38,9 @@ protected:
         return sign_nonnull;
     }
 
+    std::string get_separators_set() const {
+        return separators_set;
+    }
     std::string generate_unsigned();
     std::string generate_signed();
 
