@@ -24,7 +24,8 @@ DEPS=include/scalar/scalar-parse-unsigned.h \
      include/sse/sse-parser-unsigned-unrolled.h \
      include/sse/sse-parser-signed.h
 
-TESTS=test-stni-matcher
+TESTS=test-stni-matcher \
+      verify_signed_input_validation
 
 all: $(ALL)
 
@@ -71,6 +72,9 @@ include/hybrid-parser.inl: scripts/hybrid-generator.py
 
 test-stni-matcher: test/test-stni-matcher.cpp include/sse/sse-matcher-stni.h
 	$(CXX) $(FLAGS) $< -o $@
+
+verify_signed_input_validation: unittest/verify_signed_input_validation.cpp obj/block_info.o
+	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
 clean:
 	$(RM) $(ALL) obj/*.o

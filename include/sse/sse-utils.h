@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+
 namespace sse {
 
     __m128i decimal_digits_mask(const __m128i input) {

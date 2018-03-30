@@ -2,7 +2,7 @@ compare
 verify
 benchmark
 statistics
-test-stni-matcher
+verify_signed_input_validation
 
 *.o
 *.inl
