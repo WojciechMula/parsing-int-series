@@ -2,6 +2,7 @@ compare
 verify
 benchmark
 statistics
+test-stni-matcher
 
 *.o
 *.inl

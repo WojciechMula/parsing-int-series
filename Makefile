@@ -24,7 +24,12 @@ DEPS=include/scalar/scalar-parse-unsigned.h \
      include/sse/sse-parser-unsigned-unrolled.h \
      include/sse/sse-parser-signed.h
 
+TESTS=test-stni-matcher
+
 all: $(ALL)
+
+test: $(TESTS)
+	./test-stni-matcher
 
 compare: test/compare.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
@@ -63,6 +68,9 @@ src/block_info.inl: scripts/generator.py scripts/writer.py
 
 include/hybrid-parser.inl: scripts/hybrid-generator.py
 	python $< > $@
+
+test-stni-matcher: test/test-stni-matcher.cpp include/sse/sse-matcher-stni.h
+	$(CXX) $(FLAGS) $< -o $@
 
 clean:
 	$(RM) $(ALL) obj/*.o
