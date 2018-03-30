@@ -77,4 +77,4 @@ verify_signed_input_validation: unittest/verify_signed_input_validation.cpp obj/
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
 clean:
-	$(RM) $(ALL) obj/*.o
+	$(RM) $(ALL) $(TESTS) obj/*.o
