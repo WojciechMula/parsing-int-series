@@ -82,18 +82,17 @@ Application::Application(int argc, char* argv[])
     debug_size      = cmdline.parse_value<size_t>("--debug", to_int, 0);
     loop_count      = cmdline.parse_value<size_t>("--loops", to_int, 1);
     separators_set  = cmdline.parse_value<std::string>("--separators", parse_separators, ",; ");
-    printf("'%s'\n", separators_set.c_str());
 
     const auto seed = cmdline.parse_value("--seed", to_int, 0);
     random.seed(seed);
 
     {
         const auto arr = cmdline.parse_value<std::vector<long>>("--num", parse_array);
-        numbers = std::discrete_distribution<>(arr.begin(), arr.end());
+        distribution.numbers = discrete_distribution(arr);
     }
     {
         const auto arr = cmdline.parse_value<std::vector<long>>("--sep", parse_array, {1});
-        separators = std::discrete_distribution<>(arr.begin(), arr.end());
+        distribution.separators = discrete_distribution(arr);
     }
 
     if (cmdline.has_value("--sign")) {
@@ -101,7 +100,7 @@ Application::Application(int argc, char* argv[])
         if (arr.size() != 3) {
             throw std::logic_error("--sign expects exactly three-item distribution, like --sign=5,2,1");
         }
-        sign = std::discrete_distribution<>(arr.begin(), arr.end());
+        distribution.sign = discrete_distribution(arr);
         sign_nonnull = true;
     } else {
         sign_nonnull = false;
@@ -114,7 +113,12 @@ std::string Application::generate_unsigned() {
     std::string tmp;
 
     measure_time("generating random unsigned numbers ", [&tmp, this]{
-        tmp = ::generate_unsigned(size, get_separators_set(), random, numbers, separators);
+        tmp = ::generate_unsigned(
+                    size,
+                    get_separators_set(),
+                    random,
+                    distribution.numbers.get_distribution(),
+                    distribution.separators.get_distribution());
     });
     assert(tmp.size() == size);
 
@@ -132,7 +136,13 @@ std::string Application::generate_signed() {
     std::string tmp;
 
     measure_time("generating random signed numbers ", [&tmp, this]{
-        tmp = ::generate_signed(size, get_separators_set(), random, numbers, separators, sign);
+        tmp = ::generate_signed(
+                    size,
+                    get_separators_set(),
+                    random,
+                    distribution.numbers.get_distribution(),
+                    distribution.separators.get_distribution(),
+                    distribution.sign.get_distribution());
     });
     assert(tmp.size() == size);
 

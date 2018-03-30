@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstddef>
-#include <random>
 #include <map>
 #include <string>
 
 #include "command_line.h"
+#include "discrete_distribution.h"
 
 class Application {
 
@@ -22,9 +22,11 @@ private:
     size_t size;
     size_t debug_size;
     size_t loop_count;
-    std::discrete_distribution<> numbers;
-    std::discrete_distribution<> separators;
-    std::discrete_distribution<> sign;
+    struct {
+        discrete_distribution numbers;
+        discrete_distribution separators;
+        discrete_distribution sign;
+    } distribution;
     bool sign_nonnull;
     std::string separators_set;
 

@@ -10,6 +10,7 @@ OBJ=obj/block_info.o \
 
 CMDLINE_OBJ=obj/command_line.o \
             obj/input_generator.o \
+            obj/discrete_distribution.o \
             obj/application.o
 
 DEPS=include/scalar/scalar-parse-unsigned.h \
@@ -45,13 +46,16 @@ obj/input_generator.o: test/input_generator.cpp include/input_generator.h
 obj/command_line.o: test/command_line.cpp include/command_line.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
-obj/application.o: test/application.cpp include/application.h include/command_line.h include/input_generator.h include/time_utils.h
+obj/application.o: test/application.cpp include/application.h include/command_line.h include/input_generator.h include/time_utils.h include/discrete_distribution.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp include/sse/sse-parser-statistics.h
+	$(CXX) $(FLAGS) $< -c -o $@
+
+obj/discrete_distribution.o: test/discrete_distribution.cpp include/discrete_distribution.h
 	$(CXX) $(FLAGS) $< -c -o $@
 
 src/block_info.inl: scripts/generator.py scripts/writer.py
