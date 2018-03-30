@@ -172,9 +172,12 @@ class BlockInfo(object):
             bit = 1 << r.first
             result |= bit
 
-        # if last span has just one char it might also be a sign
-        if self.all_spans and self.all_spans[-1].last == 15:
-            result |= 0x8000
+        if self.all_spans:
+            # if last span has just one char it might also be a sign
+            last = self.all_spans[-1]
+            if last.digits() == 1:
+                bit = 1 << 15
+                result |= bit
 
         # negate result, to avoid negation in runtime
         return ~result & 0xffff
