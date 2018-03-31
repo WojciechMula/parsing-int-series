@@ -3,6 +3,9 @@ verify
 benchmark
 statistics
 verify_signed_input_validation
+verify_sse_signed_conversion
+verify_sse_unsigned_conversion
+test-stni-matcher
 
 *.o
 *.inl
