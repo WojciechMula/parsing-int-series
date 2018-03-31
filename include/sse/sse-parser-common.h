@@ -50,7 +50,7 @@ namespace sse {
                 uint32_t result = 0;
                 bool converted = false;
                 data += bi.first_skip;
-                while (*data >= '0' && *data <= '9' && data < end) {
+                while (data < end && *data >= '0' && *data <= '9') {
                     result = result * 10 + (*data - '0');
                     data += 1;
                     converted = true;
@@ -137,7 +137,7 @@ namespace sse {
                     converted = true;
                 }
 
-                while (*data >= '0' && *data <= '9' && data < end) {
+                while (data < end && *data >= '0' && *data <= '9') {
                     result = result * 10 + (*data - '0');
                     data += 1;
                     converted = true;
