@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include <immintrin.h>
 
 namespace sse {
 
