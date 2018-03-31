@@ -9,20 +9,18 @@
 #include "sse-parser-common.h"
 #include "sse-parser-statistics.h"
 #include "block_info.h"
+#include "sse-dump.h"
 
 namespace sse {
 
-    template <typename MATCHER, typename INSERTER>
-    void parser_signed(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+    namespace detail {
 
-        char* data = const_cast<char*>(string);
-        char* end  = data + size;
+        template <typename MATCHER, typename INSERTER>
+        char* process_chunk(char* data, char* end, const __m128i& input, MATCHER matcher, INSERTER output) {
 
-        const __m128i ascii_minus = _mm_set1_epi8('-');
-        const __m128i ascii_plus  = _mm_set1_epi8('+');
+            const __m128i ascii_minus = _mm_set1_epi8('-');
+            const __m128i ascii_plus  = _mm_set1_epi8('+');
 
-        while (data + 16 < end) {
-            const __m128i input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
             const __m128i bytemask_digit = decimal_digits_mask(input);
 
             const __m128i bytemask_plus  = _mm_cmpeq_epi8(input, ascii_plus);
@@ -45,18 +43,30 @@ namespace sse {
             }
 
             if (span_mask == 0) {
-                data += 16;
-                continue;
+                return data + 16;
             }
 
             STATS_INC(loops);
 
             if (sign_mask == 0 || bi.element_size == 1) {
                 // unsigned path
-                data = detail::parse_unsigned(bi, input, data, end, output);
+                return detail::parse_unsigned(bi, input, data, end, output);
             } else {
-                data = detail::parse_signed(bi, input, bytemask_sign, data, end, output);
+                return detail::parse_signed(bi, input, bytemask_sign, data, end, output);
             }
+        }
+
+    }
+
+    template <typename MATCHER, typename INSERTER>
+    void parser_signed(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+
+        char* data = const_cast<char*>(string);
+        char* end  = data + size;
+
+        while (data + 16 < end) {
+            const __m128i input = _mm_loadu_si128(reinterpret_cast<__m128i*>(data));
+            data = detail::process_chunk(data, end, input, matcher, output);
 
         } // for
 
