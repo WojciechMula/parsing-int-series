@@ -4,46 +4,14 @@
 #include <stdexcept>
 
 #include "block_info.h"
-#include "sse/sse-utils.h"
+#include "sse/sse-matcher.h"
+#include "sse/sse-parser-signed.h"
 
 const char PLUS     = '+';
 const char MINUS    = '-';
 const char SEP      = '_';
 const char DIGIT    = '1';
 const char INVALID  = 'x';
-
-bool SSE_validate_algorithm(const __m128i& input) {
-    const __m128i ascii_minus = _mm_set1_epi8(MINUS);
-    const __m128i ascii_plus  = _mm_set1_epi8(PLUS);
-    const __m128i ascii_sep   = _mm_set1_epi8(SEP); // this is done by a matcher class in a real implementation
-    const __m128i ascii_digit = _mm_set1_epi8(DIGIT);
-
-    const __m128i bytemask_digit = _mm_cmpeq_epi8(input, ascii_digit);
-
-    const __m128i bytemask_plus  = _mm_cmpeq_epi8(input, ascii_plus);
-    const __m128i bytemask_minus = _mm_cmpeq_epi8(input, ascii_minus);
-    const __m128i bytemask_sign  = _mm_or_si128(bytemask_plus, bytemask_minus);
-    const __m128i bytemask_span  = _mm_or_si128(bytemask_digit, bytemask_sign);
-
-    const __m128i bytemask_sep   = _mm_cmpeq_epi8(input, ascii_sep);
-
-    const uint16_t sign_mask     = _mm_movemask_epi8(bytemask_sign);
-    const uint16_t digit_mask    = _mm_movemask_epi8(bytemask_digit);
-    const uint16_t valid_mask    = _mm_movemask_epi8(_mm_or_si128(bytemask_sep, bytemask_span));
-
-    if ((valid_mask | sign_mask) != 0xffff) {
-        return false;
-    }
-
-    const uint16_t span_mask = sign_mask | digit_mask;
-    const BlockInfo& bi = blocks[span_mask];
-    if (sign_mask & bi.invalid_sign_mask) {
-        return false;
-    }
-
-    return true;
-}
-
 
 class Test {
 
@@ -85,12 +53,16 @@ public:
 private:
     bool validate() {
         long id = 0;
-
-        while (!increment()) {
+        
+        do {
             prepare();
 
+            if (id % 1000000 == 0) {
+                printf("%ld %s\n", id, input_string);
+            }
+
             const auto expected = is_valid();
-            const auto result   = SSE_validate_algorithm(input);
+            const auto result   = SSE_validate_algorithm();
 
             if (expected != result) {
                 printf("failed for %ld: %s\n", id, input_string);
@@ -98,10 +70,29 @@ private:
                 return false;
             }
             id += 1;
-        }
+        } while (!increment());
 
         return true;
     }
+
+    bool SSE_validate_algorithm() {
+        std::vector<int32_t> sink;
+        try {
+            sse::NaiveMatcher<1> matcher(SEP);
+            sse::detail::process_chunk(
+                input_string,
+                input_string + 16,
+                input,
+                matcher,
+                std::back_inserter(sink)
+            );
+            return true;
+        } catch (...) {
+            return false;
+        }
+    }
+
+
 
     void prepare() {
         render();
@@ -189,7 +180,6 @@ private:
                     break;
 
                 case Invalid:
-                    // a digit can follow anything
                     return false;
             } // switch
             prev = input_pattern[i];
