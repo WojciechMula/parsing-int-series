@@ -1,3 +1,4 @@
+# binaries
 compare
 verify
 benchmark
@@ -7,6 +8,10 @@ verify_sse_signed_conversion
 verify_sse_unsigned_conversion
 test-stni-matcher
 
+# a helper file not included in this repo
+sse-dump.h
+
+# the rest
 *.o
 *.inl
 *.pyc
