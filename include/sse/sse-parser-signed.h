@@ -28,15 +28,15 @@ namespace sse {
             const __m128i bytemask_sign  = _mm_or_si128(bytemask_plus, bytemask_minus);
             const __m128i bytemask_span  = _mm_or_si128(bytemask_digit, bytemask_sign);
 
-            const uint16_t sign_mask     = _mm_movemask_epi8(bytemask_sign);
-            const uint16_t span_mask     = _mm_movemask_epi8(bytemask_span);
             const uint16_t valid_mask    = _mm_movemask_epi8(matcher.get_mask(input, bytemask_span));
 
             if (valid_mask != 0xffff) {
                 throw std::runtime_error("Wrong character");
             }
 
-            const BlockInfo& bi = blocks[span_mask];
+            const uint16_t sign_mask = _mm_movemask_epi8(bytemask_sign);
+            const uint16_t span_mask = _mm_movemask_epi8(bytemask_span);
+            const BlockInfo& bi      = blocks[span_mask];
             if (sign_mask & bi.invalid_sign_mask) {
                 throw std::runtime_error("'+' or '-' at invalid position");
             }
