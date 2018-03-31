@@ -27,7 +27,8 @@ DEPS=include/scalar/scalar-parse-unsigned.h \
 TESTS=test-stni-matcher \
       verify_signed_input_validation \
       verify_sse_unsigned_conversion \
-      verify_sse_signed_conversion 
+      verify_sse_signed_conversion \
+      verify_sse_signed_parser
 
 all: $(ALL)
 
@@ -37,6 +38,7 @@ run-tests: $(TESTS)
 	./test-stni-matcher
 	./verify_sse_unsigned_conversion
 	./verify_sse_signed_conversion
+	./verify_sse_signed_parser
 	# this is quite expansive
 	./verify_signed_input_validation
 
@@ -84,10 +86,13 @@ test-stni-matcher: test/test-stni-matcher.cpp include/sse/sse-matcher-stni.h
 verify_signed_input_validation: unittest/verify_signed_input_validation.cpp obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
-verify_sse_unsigned_conversion: unittest/verify_sse_unsigned_conversion.cpp
+verify_sse_unsigned_conversion: unittest/verify_sse_unsigned_conversion.cpp obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
-verify_sse_signed_conversion: unittest/verify_sse_signed_conversion.cpp
+verify_sse_signed_conversion: unittest/verify_sse_signed_conversion.cpp obj/block_info.o
+	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
+
+verify_sse_signed_parser: unittest/verify_sse_signed_parser.cpp include/sse/sse-parser-signed.h obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
 clean:

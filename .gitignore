@@ -6,6 +6,7 @@ statistics
 verify_signed_input_validation
 verify_sse_signed_conversion
 verify_sse_unsigned_conversion
+verify_sse_signed_parser
 test-stni-matcher
 
 # a helper file not included in this repo
