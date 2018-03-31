@@ -76,7 +76,6 @@ namespace sse {
         char* parse_signed(
             const BlockInfo& bi,
             const __m128i input,
-            const __m128i bytemask_sign,
             char* data,
             char* end,
             INSERTER output
@@ -86,8 +85,11 @@ namespace sse {
             const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)bi.shuffle_digits);
             const __m128i shuffle_signs  = _mm_loadu_si128((const __m128i*)bi.shuffle_signs);
 
-            const __m128i digits         = _mm_andnot_si128(bytemask_sign, input);
-            const __m128i shuffled       = _mm_shuffle_epi8(digits, shuffle_digits);
+            // Note: there is not need to mask '+' or '-' in the input prior
+            // shuffling. This is possible because ASCII codes of '+' and '-'
+            // are smaller than '0' (43 < 48 && 45 < 48). These character will
+            // be zeroed during subtraction of '0'.
+            const __m128i shuffled       = _mm_shuffle_epi8(input, shuffle_digits);
             const __m128i shuffled_signs = _mm_shuffle_epi8(input, shuffle_signs);
             const __m128i negate_mask    = _mm_cmpeq_epi8(shuffled_signs, ascii_minus);
 

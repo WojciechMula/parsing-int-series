@@ -51,7 +51,7 @@ namespace sse {
                 // unsigned path
                 return detail::parse_unsigned(bi, input, data, end, output);
             } else {
-                return detail::parse_signed(bi, input, bytemask_sign, data, end, output);
+                return detail::parse_signed(bi, input, data, end, output);
             }
         }
 
