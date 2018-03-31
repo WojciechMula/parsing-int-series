@@ -35,14 +35,9 @@ namespace sse {
             const uint64_t digit_mask3 = _mm_movemask_epi8(t3);
             const uint64_t valid_mask3 = _mm_movemask_epi8(matcher.get_mask(input3, t3));
 
-            const uint64_t valid_mask = valid_mask0
-                                      | (valid_mask1 << (1*16))
-                                      | (valid_mask2 << (2*16))
-                                      | (valid_mask3 << (3*16));
-
             STATS_INC(loops);
 
-            if (valid_mask != uint64_t(-1)) {
+            if ((valid_mask0 & valid_mask1 & valid_mask2 & valid_mask3) != 0xffff) {
                 throw std::runtime_error("Wrong character");
             }
 
