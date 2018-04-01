@@ -77,9 +77,6 @@ namespace sse {
         char* data = const_cast<char*>(string);
         char* end  = data + size;
 
-        const __m128i ascii_minus = _mm_set1_epi8('-');
-        const __m128i ascii_plus  = _mm_set1_epi8('+');
-
         while (data + 4*16 < end) {
             detail::result_type res = detail::prepare_masks(data, matcher);
 
