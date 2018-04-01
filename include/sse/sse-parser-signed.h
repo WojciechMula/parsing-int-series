@@ -46,7 +46,7 @@ namespace sse {
 
             STATS_INC(loops);
 
-            if (sign_mask == 0 || bi.element_size == 1) {
+            if (sign_mask == 0 || bi.conversion == Conversion::SSE1Digit) {
                 // unsigned path
                 return detail::parse_unsigned(bi, input, data, end, output);
             } else {

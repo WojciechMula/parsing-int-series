@@ -3,7 +3,7 @@ ITEM_PATTERN = \
     "%(FIRST_SKIP)s," \
     "%(TOTAL_SKIP)s," \
     "%(ELEMENT_COUNT)s," \
-    "%(ELEMENT_SIZE)s," \
+    "%(CONVERSION)s," \
     "0x%(INVALID_SIGN_MASK)04x," \
     "{%(SHUFFLE_DIGITS)s}," \
     "{%(SHUFFLE_SIGNS)s}" \
@@ -45,7 +45,7 @@ class CPPWriter(object):
             'FIRST_SKIP'        : block.first_skip,
             'TOTAL_SKIP'        : block.total_skip,
             'ELEMENT_COUNT'     : len(block.spans),
-            'ELEMENT_SIZE'      : block.element_size,
+            'CONVERSION'        : self.get_conversion_enum(block),
             'INVALID_SIGN_MASK' : block.get_invalid_sign_mask(),
             'SHUFFLE_DIGITS'    : self._make_c_array(block.shuffle_digits),
             'SHUFFLE_SIGNS'     : self._make_c_array(block.shuffle_signs),
@@ -59,3 +59,23 @@ class CPPWriter(object):
     def _make_c_array(self, numbers):
         return ','.join('0x%02x' % x for x in numbers)
 
+    def get_conversion_enum(self, block):
+        if block.element_size == 0:
+            return 'Conversion::Empty'
+
+        if block.element_size == 1:
+            return 'Conversion::SSE1Digit'
+
+        if block.element_size == 2:
+            return 'Conversion::SSE2Digits'
+
+        if block.element_size == 4:
+            return 'Conversion::SSE4Digits'
+
+        if block.element_size == 8:
+            return 'Conversion::SSE8Digits'
+
+        if block.element_size == 16:
+            return 'Conversion::Scalar'
+
+        assert False

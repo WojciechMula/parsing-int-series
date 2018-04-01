@@ -18,28 +18,28 @@ namespace sse {
             const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)bi.shuffle_digits);
             const __m128i shuffled = _mm_shuffle_epi8(input, shuffle_digits);
 
-            if (bi.element_size == 1) {
+            if (bi.conversion == Conversion::SSE1Digit) {
 
                 convert_1digit(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit1_calls);
                 STATS_ADD(unsigned_path.digit1_converted, bi.element_count);
 
-            } else if (bi.element_size == 2) {
+            } else if (bi.conversion == Conversion::SSE2Digits) {
 
                 convert_2digits(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit2_calls);
                 STATS_ADD(unsigned_path.digit2_converted, bi.element_count);
 
-            } else if (bi.element_size == 4) {
+            } else if (bi.conversion == Conversion::SSE4Digits) {
 
                 convert_4digits(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit4_calls);
                 STATS_ADD(unsigned_path.digit4_converted, bi.element_count);
 
-            } else if (bi.element_size == 8) {
+            } else if (bi.conversion == Conversion::SSE8Digits) {
 
                 convert_8digits(shuffled, bi.element_count, output);
 
@@ -93,25 +93,25 @@ namespace sse {
             const __m128i shuffled_signs = _mm_shuffle_epi8(input, shuffle_signs);
             const __m128i negate_mask    = _mm_cmpeq_epi8(shuffled_signs, ascii_minus);
 
-            if (bi.element_size == 1) {
+            if (bi.conversion == Conversion::SSE1Digit) {
 
                 convert_1digit(shuffled, bi.element_count, output);
 
-            } else if (bi.element_size == 2) {
+            } else if (bi.conversion == Conversion::SSE2Digits) {
 
                 convert_2digits_signed(shuffled, negate_mask, bi.element_count, output);
 
                 STATS_INC(signed_path.digit2_calls);
                 STATS_ADD(signed_path.digit2_converted, bi.element_count);
 
-            } else if (bi.element_size == 4) {
+            } else if (bi.conversion == Conversion::SSE4Digits) {
 
                 convert_4digits_signed(shuffled, negate_mask, bi.element_count, output);
 
                 STATS_INC(signed_path.digit4_calls);
                 STATS_ADD(signed_path.digit4_converted, bi.element_count);
 
-            } else if (bi.element_size == 8) {
+            } else if (bi.conversion == Conversion::SSE8Digits) {
 
                 convert_8digits_signed(shuffled, negate_mask, bi.element_count, output);
 

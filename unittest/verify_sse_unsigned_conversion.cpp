@@ -10,7 +10,6 @@
 #include "scalar/scalar-parse-signed.h"
 #include "sse/sse-convert.h"
 #include "sse/sse-matcher.h"
-#include "sse/sse-parser-unsigned.h"
 
 class Verify {
 
@@ -39,13 +38,13 @@ public:
 
             using namespace sse;
 
-            if (b.element_size == 1) {
+            if (b.conversion == Conversion::SSE1Digit) {
                 convert_1digit(shuffled, b.element_count, &result[0]);
-            } else if (b.element_size == 2) {
+            } else if (b.conversion == Conversion::SSE2Digits) {
                 convert_2digits(shuffled, b.element_count, &result[0]);
-            } else if (b.element_size == 4) {
+            } else if (b.conversion == Conversion::SSE4Digits) {
                 convert_4digits(shuffled, b.element_count, &result[0]);
-            } else if (b.element_size == 8) {
+            } else if (b.conversion == Conversion::SSE8Digits) {
                 convert_8digits(shuffled, b.element_count, &result[0]);
             } else {
                 unsupported += 1;
