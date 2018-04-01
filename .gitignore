@@ -1,5 +1,6 @@
 # binaries
 compare
+compare-avx512
 verify
 benchmark
 statistics
@@ -18,3 +19,4 @@ sse-dump.h
 *.pyc
 
 perf.data
+perf.data.old

@@ -3,7 +3,7 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=compare verify benchmark statistics
+ALL=compare verify benchmark statistics compare-avx512
 
 OBJ=obj/block_info.o \
     obj/sse-parser-statistics.o
@@ -42,6 +42,9 @@ run-tests: $(TESTS)
 
 compare: test/compare.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
+
+compare-avx512: test/compare-avx512.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ) include/avx512/avx512-parser-signed.h
+	$(CXX) $(FLAGS) -mavx512vbmi $< $(OBJ) $(CMDLINE_OBJ) -o $@
 
 verify: test/verify.cpp $(DEPS) $(OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) -o $@
