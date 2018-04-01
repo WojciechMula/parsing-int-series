@@ -70,7 +70,11 @@ class CPPWriter(object):
             return 'Conversion::SSE2Digits'
 
         if block.element_size == 4:
-            return 'Conversion::SSE4Digits'
+            if all(r.digits() == 3 for r in block.spans):
+                print block
+                return 'Conversion::SSE3Digits'
+            else:
+                return 'Conversion::SSE4Digits'
 
         if block.element_size == 8:
             return 'Conversion::SSE8Digits'

@@ -9,6 +9,7 @@ enum class Conversion: uint8_t {
     Empty,
     SSE1Digit,
     SSE2Digits,
+    SSE3Digits,
     SSE4Digits,
     SSE8Digits,
     Scalar

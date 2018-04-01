@@ -91,10 +91,10 @@ test-stni-matcher: test/test-stni-matcher.cpp include/sse/sse-matcher-stni.h
 verify_signed_input_validation: unittest/verify_signed_input_validation.cpp obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
-verify_sse_unsigned_conversion: unittest/verify_sse_unsigned_conversion.cpp obj/block_info.o
+verify_sse_unsigned_conversion: unittest/verify_sse_unsigned_conversion.cpp include/sse/sse-convert.h obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
-verify_sse_signed_parser: unittest/verify_sse_signed_parser.cpp include/sse/sse-parser-signed.h obj/block_info.o
+verify_sse_signed_parser: unittest/verify_sse_signed_parser.cpp include/sse/sse-parser-common.h include/sse/sse-parser-signed.h obj/block_info.o
 	$(CXX) $(FLAGS) obj/block_info.o $< -o $@
 
 clean:

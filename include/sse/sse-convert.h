@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <immintrin.h>
 
+#include "sse-dump.h"
+
 namespace sse {
 
 #define SSE_ALIGN __attribute__ ((aligned (16)))
@@ -31,6 +33,25 @@ namespace sse {
         uint16_t tmp[8] SSE_ALIGN;
 
         _mm_store_si128((__m128i*)tmp, t1);
+        for (int i=0; i < count; i++)
+            *output++ = tmp[i];
+    }
+
+    template <typename INSERTER>
+    void convert_3digits(const __m128i& input, int count, INSERTER output) {
+
+        const __m128i ascii0    = _mm_set1_epi8('0');
+        const __m128i mul_all   = _mm_setr_epi8(0, 100, 10, 1, 0, 100, 10, 1, 0, 100, 10, 1, 0, 100, 10, 1);
+
+        // =--------------
+
+        const __m128i t0 = _mm_subs_epu8(input, ascii0);
+        const __m128i t1 = _mm_maddubs_epi16(t0, mul_all);
+        const __m128i t2 = _mm_hadd_epi16(t1, t1);
+
+        uint16_t tmp[8] SSE_ALIGN;
+
+        _mm_store_si128((__m128i*)tmp, t2);
         for (int i=0; i < count; i++)
             *output++ = tmp[i];
     }
@@ -92,6 +113,28 @@ namespace sse {
         int16_t tmp[8] SSE_ALIGN;
 
         _mm_store_si128((__m128i*)tmp, s1);
+        for (int i=0; i < count; i++)
+            *output++ = tmp[i];
+    }
+
+    template <typename INSERTER>
+    void convert_3digits_signed(const __m128i& input, const __m128i& negate_mask, int count, INSERTER output) {
+
+        const __m128i ascii0    = _mm_set1_epi8('0');
+        const __m128i mul_all   = _mm_setr_epi8(0, 100, 10, 1, 0, 100, 10, 1, 0, 100, 10, 1, 0, 100, 10, 1);
+
+        const __m128i s0 = _mm_xor_si128(mul_all, negate_mask);
+        const __m128i s1 = _mm_sub_epi8(s0, negate_mask);
+
+        // =--------------
+
+        const __m128i t0 = _mm_subs_epu8(input, ascii0);
+        const __m128i t1 = _mm_maddubs_epi16(t0, s1);
+        const __m128i t2 = _mm_hadd_epi16(t1, t1);
+
+        int16_t tmp[8] SSE_ALIGN;
+
+        _mm_store_si128((__m128i*)tmp, t2);
         for (int i=0; i < count; i++)
             *output++ = tmp[i];
     }

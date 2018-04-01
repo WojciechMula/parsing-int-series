@@ -42,6 +42,8 @@ public:
                 convert_1digit(shuffled, b.element_count, &result[0]);
             } else if (b.conversion == Conversion::SSE2Digits) {
                 convert_2digits(shuffled, b.element_count, &result[0]);
+            } else if (b.conversion == Conversion::SSE3Digits) {
+                convert_3digits(shuffled, b.element_count, &result[0]);
             } else if (b.conversion == Conversion::SSE4Digits) {
                 convert_4digits(shuffled, b.element_count, &result[0]);
             } else if (b.conversion == Conversion::SSE8Digits) {
