@@ -95,7 +95,7 @@ namespace sse {
 
             if (bi.element_size == 1) {
 
-                // never reached
+                convert_1digit(shuffled, bi.element_count, output);
 
             } else if (bi.element_size == 2) {
 
