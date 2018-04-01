@@ -11,6 +11,7 @@
 #include "sse/sse-parser-unsigned.h"
 #include "sse/sse-parser-unsigned-unrolled.h"
 #include "sse/sse-parser-signed.h"
+#include "sse/sse-parser-signed-unrolled.h"
 
 #include "application.h"
 
@@ -151,8 +152,21 @@ bool BenchmarkApp::run_signed() {
         }
     });
 
+    const auto t2 = measure_time("SSE (unrolled):", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.SSE.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            sse::parser_signed_unrolled(
+                tmp.data(), tmp.size(),
+                separators,
+                std::move(matcher), std::back_inserter(result_signed.SSE));
+        }
+    });
+
     puts("");
-    printf("SSE         speed-up: %0.2f\n", t0 / double(t1));
+    printf("SSE             : x %0.2f\n", t0 / double(t1));
+    printf("SSE (unrolled)  : x %0.2f\n", t0 / double(t2));
 
     const auto s0 = sum(result_signed.reference);
     const auto s1 = sum(result_signed.SSE);
