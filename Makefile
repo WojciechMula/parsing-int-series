@@ -3,7 +3,7 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=compare verify benchmark statistics compare-avx512
+ALL=compare-signed compare-unsigned verify benchmark statistics compare-avx512
 
 OBJ=obj/block_info.o \
     obj/sse-parser-statistics.o
@@ -22,7 +22,8 @@ DEPS=include/scalar/scalar-parse-unsigned.h \
      include/sse/sse-parser-common.h \
      include/sse/sse-parser-unsigned.h \
      include/sse/sse-parser-unsigned-unrolled.h \
-     include/sse/sse-parser-signed.h
+     include/sse/sse-parser-signed.h \
+     include/sse/sse-parser-signed-unrolled.h
 
 TESTS=test-stni-matcher \
       verify_signed_input_validation \
@@ -40,7 +41,10 @@ run-tests: $(TESTS)
 	# this is quite expansive
 	./verify_signed_input_validation
 
-compare: test/compare.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
+compare-unsigned: test/compare-unsigned.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
+	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
+
+compare-signed: test/compare-signed.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ)
 	$(CXX) $(FLAGS) $< $(OBJ) $(CMDLINE_OBJ) -o $@
 
 compare-avx512: test/compare-avx512.cpp $(DEPS) $(OBJ) $(CMDLINE_OBJ) include/avx512/avx512-parser-signed.h

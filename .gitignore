@@ -1,5 +1,6 @@
 # binaries
-compare
+compare-signed
+compare-unsigned
 compare-avx512
 verify
 benchmark
