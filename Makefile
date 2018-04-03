@@ -3,7 +3,7 @@
 FLAGS:=-std=c++11 -Wall -Wextra -pedantic -march=native -O3 $(CXXFLAGS)
 FLAGS:=$(FLAGS) -Iinclude
 
-ALL=compare-signed compare-unsigned verify benchmark statistics compare-avx512
+ALL=compare-signed compare-unsigned verify benchmark-single benchmark statistics compare-avx512
 
 OBJ=obj/block_info.o \
     obj/sse-parser-statistics.o
@@ -59,6 +59,10 @@ statistics: test/statistics.cpp $(DEPS) $(STATISTICS_OBJ)
 
 BENCHMARK_OBJ=$(OBJ) $(CMDLINE_OBJ)
 benchmark: test/benchmark.cpp $(DEPS) include/time_utils.h include/hybrid-parser.inl $(BENCHMARK_OBJ)
+	$(CXX) $(FLAGS) $< $(BENCHMARK_OBJ) -o $@
+
+BENCHMARK_OBJ=$(OBJ) $(CMDLINE_OBJ)
+benchmark-single: test/benchmark-single.cpp $(DEPS) include/time_utils.h $(BENCHMARK_OBJ)
 	$(CXX) $(FLAGS) $< $(BENCHMARK_OBJ) -o $@
 
 obj/input_generator.o: test/input_generator.cpp include/input_generator.h

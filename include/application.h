@@ -16,9 +16,10 @@ public:
         ArgumentError(const std::string& msg) : std::logic_error(msg) {}
     };
 
-private:
+protected:
     CommandLine cmdline;
 
+private:
     size_t size;
     size_t debug_size;
     size_t loop_count;

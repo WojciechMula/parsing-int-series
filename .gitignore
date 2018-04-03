@@ -4,6 +4,7 @@ compare-unsigned
 compare-avx512
 verify
 benchmark
+benchmark-single
 statistics
 verify_signed_input_validation
 verify_sse_signed_conversion
