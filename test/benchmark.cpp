@@ -6,7 +6,6 @@
 
 #include "time_utils.h"
 #include "scalar/scalar-parse-unsigned.h"
-#include "hybrid-parser.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
 #include "sse/sse-parser-unsigned-unrolled.h"
@@ -17,167 +16,127 @@
 
 class BenchmarkApp: public Application {
 
-    using UnsignedVector = std::vector<uint32_t>;
-    using SignedVector = std::vector<int32_t>;
+    using Vector = std::vector<int32_t>;
+
+    enum class Procedure {
+        Scalar,
+        SSE,
+        SSEUnrolled
+    };
+
+    std::string procedure_name;
+    Procedure procedure;
 
 public:
-    BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
+    BenchmarkApp(int argc, char** argv);
 
 public:
-    bool run() {
-        if (has_signed_distribution()) {
-            return run_signed();
-        } else {
-            return run_unsigned();
-        }
-    }
+    void run();
 
 private:
-    bool run_unsigned();
-    bool run_signed();
-
-private:
+    Vector result;
     std::string tmp;
-
-    struct ResultUnsigned {
-        UnsignedVector reference;
-        UnsignedVector hybrid;
-        UnsignedVector SSE;
-        UnsignedVector SSEblock;
-    } result_unsigned;
-
-    struct ResultSigned {
-        SignedVector reference;
-        SignedVector SSE;
-    } result_signed;
 
 private:
     template <typename T>
     uint64_t sum(const T& vec) const {
         return std::accumulate(vec.begin(), vec.end(), 0);
     }
+
+    template <typename FUN>
+    Clock::time_point::rep measure_time(FUN fun) {
+
+        Clock::time_point::rep min = 0;
+        for (size_t i=0; i < get_loop_count(); i++) {
+            result.clear();
+            const auto t1 = Clock::now();
+            fun();
+            const auto t2 = Clock::now();
+
+            const auto dt = elapsed(t1, t2);
+            if (i == 0) {
+                min = dt;
+            } else {
+                min = std::min(dt, min);
+            }
+        }
+
+        return min;
+    }
+
 };
 
-bool BenchmarkApp::run_unsigned() {
+BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {
 
-    printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
+    procedure_name = cmdline.get_value("--procedure", "");
+    if (procedure_name.empty()) {
+        throw ArgumentError("Procedure name must not be empty");
+    }
 
-    tmp = generate_unsigned();
-
-    const char* separators = ";, ";
-
-    const auto t0 = measure_time("scalar      : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_unsigned.reference.clear();
-            scalar::parse_unsigned(tmp.data(), tmp.size(), separators,
-                                   std::back_inserter(result_unsigned.reference));
-        }
-    });
-
-    const auto t1 = measure_time("hybrid      : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_unsigned.hybrid.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            hybrid_parser(tmp.data(), tmp.size(), separators,
-                          std::move(matcher), std::back_inserter(result_unsigned.hybrid));
-        }
-    });
-
-    const auto t2 = measure_time("SSE         : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_unsigned.SSE.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            sse::parser(tmp.data(), tmp.size(), separators,
-                        std::move(matcher), std::back_inserter(result_unsigned.SSE));
-        }
-    });
-
-    const auto t3 = measure_time("SSE (block) : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_unsigned.SSEblock.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_block(tmp.data(), tmp.size(), separators,
-                              std::move(matcher), std::back_inserter(result_unsigned.SSEblock));
-        }
-    });
-
-    puts("");
-    printf("hybrid      speed-up: %0.2f\n", t0 / double(t1));
-    printf("SSE         speed-up: %0.2f\n", t0 / double(t2));
-    printf("SSE (block) speed-up: %0.2f\n", t0 / double(t3));
-
-    const auto s0 = sum(result_unsigned.reference);
-    const auto s1 = sum(result_unsigned.hybrid);
-    const auto s2 = sum(result_unsigned.SSE);
-    const auto s3 = sum(result_unsigned.SSEblock);
-    printf("reference results: %lu %lu %lu %lu\n", s0, s1, s2, s3);
-
-    if (s0 == s1 && s0 == s2 && s0 == s3) {
-        return true;
+    if (procedure_name == "scalar") {
+        procedure = Procedure::Scalar;
+    } else if (procedure_name == "sse") {
+        procedure = Procedure::SSE;
+    } else if (procedure_name == "sse-unrolled") {
+        procedure = Procedure::SSEUnrolled;
     } else {
-        puts("FAILED");
-        return false;
+        throw ArgumentError("Unknown procedure name. It must be: 'scalar', 'sse', 'sse-unrolled'");
     }
 }
 
 
-bool BenchmarkApp::run_signed() {
 
-    printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
+void BenchmarkApp::run() {
 
     tmp = generate_signed();
 
-    const char* separators = ";, ";
+    Clock::time_point::rep time;
 
-    const auto t0 = measure_time("scalar      : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_signed.reference.clear();
-            scalar::parse_signed(tmp.data(), tmp.size(), separators,
-                                 std::back_inserter(result_signed.reference));
-        }
-    });
+    switch (procedure) {
+        case Procedure::Scalar:
+            time = measure_time([this] {
+                    scalar::parse_signed(tmp.data(), tmp.size(), get_separators_set().c_str(),
+                                         std::back_inserter(result));
+                });
+            break;
 
-    const auto t1 = measure_time("SSE         : ", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_signed.SSE.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_signed(tmp.data(), tmp.size(), separators,
-                               std::move(matcher), std::back_inserter(result_signed.SSE));
-        }
-    });
+        case Procedure::SSE:
+            time = measure_time([this] {
+                    sse::NaiveMatcher<8> matcher(get_separators_set().c_str());
+                    sse::parser_signed(
+                        tmp.data(),
+                        tmp.size(),
+                        get_separators_set().c_str(),
+                        std::move(matcher),
+                        std::back_inserter(result));
+                });
+            break;
 
-    const auto t2 = measure_time("SSE (unrolled):", [this, separators] {
-        auto k = get_loop_count();
-        while (k--) {
-            result_signed.SSE.clear();
-            sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_signed_unrolled(
-                tmp.data(), tmp.size(),
-                separators,
-                std::move(matcher), std::back_inserter(result_signed.SSE));
-        }
-    });
+        case Procedure::SSEUnrolled:
+            time = measure_time([this] {
+                    sse::NaiveMatcher<8> matcher(get_separators_set().c_str());
+                    sse::parser_signed_unrolled(
+                        tmp.data(),
+                        tmp.size(),
+                        get_separators_set().c_str(),
+                        std::move(matcher),
+                        std::back_inserter(result));
+                });
+            break;
 
-    puts("");
-    printf("SSE             : x %0.2f\n", t0 / double(t1));
-    printf("SSE (unrolled)  : x %0.2f\n", t0 / double(t2));
-
-    const auto s0 = sum(result_signed.reference);
-    const auto s1 = sum(result_signed.SSE);
-    printf("reference results: %lu %lu\n", s0, s1);
-
-    if (s0 == s1) {
-        return true;
-    } else {
-        puts("FAILED");
-        return false;
+        default:
+            __builtin_unreachable();
+            time = 0;
+            assert(false);
+            break;
     }
+
+    printf("input size : %lu\n", get_size());
+    printf("loops      : %lu\n", get_loop_count());
+    printf("procedure  : %s\n", procedure_name.c_str());
+    printf("time       : %ld us\n", time);
+    // this prevents compiler from optimizing out the benchmark loop
+    printf("reference results: %lu\n", sum(result));
 }
 
 
@@ -185,8 +144,9 @@ int main(int argc, char* argv[]) {
 
     try {
         BenchmarkApp app(argc, argv);
+        app.run();
 
-        return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
+        return EXIT_SUCCESS;
 
     } catch (std::exception& e) {
         printf("%s\n", e.what());
