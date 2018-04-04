@@ -88,8 +88,6 @@ BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {
 
 void BenchmarkApp::run() {
 
-    printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
-
     tmp = generate_signed();
 
     Clock::time_point::rep time;
@@ -133,7 +131,12 @@ void BenchmarkApp::run() {
             break;
     }
 
-    printf("%s: %ld us, reference results: %lu\n", procedure_name.c_str(), time, sum(result));
+    printf("input size : %lu\n", get_size());
+    printf("loops      : %lu\n", get_loop_count());
+    printf("procedure  : %s\n", procedure_name.c_str());
+    printf("time       : %ld us\n", time);
+    // this prevents compiler from optimizing out the benchmark loop
+    printf("reference results: %lu\n", sum(result));
 }
 
 
