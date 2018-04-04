@@ -115,6 +115,7 @@ bin/compare-unsigned: test/compare-unsigned.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_
 bin/compare-avx512: test/compare-avx512.cpp $(PARSER_AVX512_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) -mavx512vbmi $(CMDLINE_OBJ) $< -o $@
 
+
 # cmdline utilites
 # --------------------------------------------------------------------------------
 
@@ -130,8 +131,23 @@ obj/discrete_distribution.o: test/utils/discrete_distribution.cpp include/test/d
 obj/input_generator.o: test/utils/input_generator.cpp include/test/input_generator.h
 	$(CXX) $(FLAGS) -c $< -o $@
 
+
 # hybrid parser
 # --------------------------------------------------------------------------------
 
 include/hybrid-parser.inl: scripts/hybrid-generator.py
 	python $< > $@
+
+
+# experiments
+# --------------------------------------------------------------------------------
+
+measurements.txt: bin/benchmark experiments/experiment.py experiments/testcases.py
+	# this is a long-running procedure, it'd be better to see if the program really works
+	python experiments/experiment.py | tee /tmp/$@
+	mv /tmp/$@ $@
+
+report.rst: measurements.txt experiments/report.py experiments/writer.py experiments/table.py
+	python experiments/report.py $< > /tmp/$@
+	mv /tmp/$@ $@
+

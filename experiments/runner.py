@@ -1,6 +1,6 @@
 import subprocess
 
-EXECUTABLE = './benchmark-single'
+EXECUTABLE = './bin/benchmark'
 
 
 class Runner(object):

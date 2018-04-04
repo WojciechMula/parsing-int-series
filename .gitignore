@@ -1,10 +1,15 @@
 # a helper file not included in this repo
 sse-dump.h
 
+# auto-generated files
+*.inl
+
 # the rest
 *.o
-*.inl
 *.pyc
+./report.rst
+./measurement.txt
 
 perf.data
 perf.data.old
+
