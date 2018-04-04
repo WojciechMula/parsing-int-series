@@ -3,8 +3,6 @@
 #include <cstdint>
 #include <immintrin.h>
 
-#include "sse-dump.h"
-
 namespace sse {
 
 #define SSE_ALIGN __attribute__ ((aligned (16)))
