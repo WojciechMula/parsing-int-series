@@ -197,11 +197,9 @@ class BlockInfo(object):
 
 class Generator(object):
     def run(self):
-        result = []
         for i in xrange(2**16):
-            result.append(self.__get_structure(i))
+            yield self.__get_structure(i)
 
-        return result
 
     def __get_structure(self, number):
         parser = Parser(number)
@@ -239,7 +237,7 @@ class Generator(object):
 
 def main(path):
     gen  = Generator()
-    data = gen.run()
+    data = list(gen.run())
 
     writer = Writer(data)
     writer.save(path)
