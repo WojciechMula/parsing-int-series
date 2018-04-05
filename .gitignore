@@ -7,8 +7,8 @@ sse-dump.h
 # the rest
 *.o
 *.pyc
-./report.rst
-./measurement.txt
+report.rst
+measurements.txt
 
 perf.data
 perf.data.old

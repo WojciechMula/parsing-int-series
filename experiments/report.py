@@ -142,8 +142,8 @@ class Report(object):
             t2 = item[4]
             if t0 < 10 and t1 < 10 and t2 < 10:
                 # don't fool people when all measurements are single-digit numbers
-                speedup_sse = '-'
-                speedup_sse_unrolled = '-'
+                speedup_sse = '---'
+                speedup_sse_unrolled = '---'
             else:
                 speedup_sse = '%0.2f' % (float(t0)/t1)
                 speedup_sse_unrolled = '%0.2f' % (float(t0)/t2)

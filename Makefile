@@ -153,7 +153,7 @@ measurements.txt: bin/benchmark experiments/experiment.py experiments/testcases.
 	python experiments/experiment.py | tee /tmp/$@
 	mv /tmp/$@ $@
 
-report.rst: measurements.txt experiments/report.py experiments/writer.py experiments/table.py
-	python experiments/report.py $< > /tmp/$@
+report.rst: measurements.txt experiments/postprocess.py experiments/report.py experiments/writer.py experiments/table.py
+	python experiments/postprocess.py $< "^#*" > /tmp/$@
 	mv /tmp/$@ $@
 

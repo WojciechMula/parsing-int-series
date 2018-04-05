@@ -5,6 +5,9 @@ class RestWriter(object):
 
 
     def write(self, restsection="-~#"):
+
+        assert len(restsection) >= 3
+
         for separator, collection1 in self.report:
             self.write_header(separator, restsection[0], 80)
             for distribution, collection2 in collection1:
