@@ -58,7 +58,8 @@ BENCHMARK= \
 TEST= \
     bin/compare-signed \
     bin/compare-unsigned \
-    bin/compare-avx512
+    bin/compare-avx512 \
+    bin/statistics
 
 ALL=$(UNITTESTS) $(BENCHMARK) $(TEST)
 
@@ -115,6 +116,8 @@ bin/compare-unsigned: test/compare-unsigned.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_
 bin/compare-avx512: test/compare-avx512.cpp $(PARSER_AVX512_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) -mavx512vbmi $(CMDLINE_OBJ) $< -o $@
 
+bin/statistics: test/statistics.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) obj/sse-parser-statistics.o
+	$(CXX) $(FLAGS) $(CMDLINE_OBJ) obj/sse-parser-statistics.o $< -o $@
 
 # cmdline utilites
 # --------------------------------------------------------------------------------
@@ -129,6 +132,9 @@ obj/discrete_distribution.o: test/utils/discrete_distribution.cpp include/test/d
 	$(CXX) $(FLAGS) -c $< -o $@
 
 obj/input_generator.o: test/utils/input_generator.cpp include/test/input_generator.h
+	$(CXX) $(FLAGS) -c $< -o $@
+
+obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp include/sse/sse-parser-statistics.h
 	$(CXX) $(FLAGS) -c $< -o $@
 
 
