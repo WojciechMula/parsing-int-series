@@ -77,9 +77,11 @@ run-unittests: $(UNITTESTS)
 
 # --------------------------------------------------------------------------------
 
-obj/block_info.o: src/block_info.cpp include/block_info.h scripts/generator.py scripts/writer.py
+obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
 	$(CXX) $(FLAGS) -c $< -o $@
 
+src/block_info.inl: scripts/generator.py scripts/writer.py
+	python $< $@
 
 # unit tests
 # --------------------------------------------------------------------------------
