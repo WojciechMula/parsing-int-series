@@ -1,5 +1,7 @@
 from table import Table
 from loader import load, get_distribution_title, get_separator_title
+from utils import groupby
+
 
 class Report(object):
 
@@ -137,15 +139,4 @@ class Report(object):
         else:
             assert False
 
-
-def groupby(sequence, keyfun):
-    d = {}
-    for item in sequence:
-        key = keyfun(item)
-        if key not in d:
-            d[key] = [item]
-        else:
-            d[key].append(item)
-
-    return d
 
