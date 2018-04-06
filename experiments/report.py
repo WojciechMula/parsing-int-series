@@ -1,22 +1,11 @@
 from table import Table
-
-
-class Item(object):
-    __slots__ = ("procedure",
-                 "size",
-                 "loops",
-                 "distribution_name",
-                 "num_distribution",
-                 "sep_distribution",
-                 "sign_distribution",
-                 "time")
-
+from loader import load, get_distribution_title, get_separator_title
 
 class Report(object):
 
     def __init__(self, path):
         with open(path, 'rt') as f:
-            self.raw_data = self.load(f)
+            self.raw_data = load(f)
 
         # group by separators distribution
         bysep = lambda item: item.sep_distribution
@@ -25,43 +14,13 @@ class Report(object):
         for sep, collection in groupby(self.raw_data, bysep).iteritems():
             ret = self.split_by_distribution(collection)
             self.report.append((
-                self.separator_title(sep),
+                get_separator_title(sep),
                 ret
             ))
 
 
     def get(self):
         return self.report
-
-
-    def load(self, file):
-        L = []
-        for line in file:   
-            F = line.split(';')
-
-            L.append(Item())
-            item = L[-1]
-
-            item.procedure          = F[0]
-            item.size               = int(F[1])
-            item.loops              = int(F[2])
-            item.distribution_name  = F[3]
-            item.num_distribution   = F[4]
-            item.sep_distribution   = F[5]
-            item.sign_distribution  = F[6]
-            item.time               = int(F[7])
-
-        return L
-
-
-    def separator_title(self, sep_distribution):
-        if sep_distribution == '1':
-            separator = 'Single separator character'
-        else:
-            k = len(sep_distribution.split(','))
-            separator = '1 .. %d separator characters' % k
-
-        return separator
 
 
     def split_by_distribution(self, collection):
@@ -72,23 +31,12 @@ class Report(object):
         for distribution_name, collection in tmp.iteritems():
             res = self.split_by_parameters(distribution_name, collection)
             result.append((
-                self.distribution_title(distribution_name),
+                get_distribution_title(distribution_name),
                 res
             ))
 
         return result
  
-
-    def distribution_title(self, distribution_name):
-        if distribution_name == 'single':
-            return 'Fixed length'
-        elif distribution_name == 'normal':
-            return 'Guassian distribution'
-        elif distribution_name == 'uniform':
-            return 'Uniform distribution'
-        else:
-            assert False
-
 
     def split_by_parameters(self, distribution_name, collection):
         byparam = lambda item: item.num_distribution
