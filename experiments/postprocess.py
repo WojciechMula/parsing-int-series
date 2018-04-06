@@ -1,6 +1,6 @@
 import sys
 from report import Report
-from writer import RestWriter
+from report_writer import RestWriter
 
 
 def main():
