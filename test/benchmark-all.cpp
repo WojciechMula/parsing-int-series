@@ -6,6 +6,7 @@
 
 #include "time_utils.h"
 #include "scalar/scalar-parse-unsigned.h"
+#include "scalar/std-parser-signed.h"
 #include "hybrid-parser.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
@@ -49,6 +50,8 @@ private:
     struct ResultSigned {
         SignedVector reference;
         SignedVector SSE;
+        SignedVector SSEblock;
+        SignedVector std_scalar;
     } result_signed;
 
 private:
@@ -152,27 +155,41 @@ bool BenchmarkApp::run_signed() {
         }
     });
 
-    const auto t2 = measure_time("SSE (unrolled):", [this, separators] {
+    const auto t2 = measure_time("SSE (block) : ", [this, separators] {
         auto k = get_loop_count();
         while (k--) {
-            result_signed.SSE.clear();
+            result_signed.SSEblock.clear();
             sse::NaiveMatcher<8> matcher(separators);
             sse::parser_signed_unrolled(
                 tmp.data(), tmp.size(),
                 separators,
-                std::move(matcher), std::back_inserter(result_signed.SSE));
+                std::move(matcher), std::back_inserter(result_signed.SSEblock));
+        }
+    });
+
+    const auto t3 = measure_time("scalar (std): ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.std_scalar.clear();
+            scalar::cstd::parse_signed(
+                tmp.data(), tmp.size(),
+                separators,
+                std::back_inserter(result_signed.std_scalar));
         }
     });
 
     puts("");
-    printf("SSE             : x %0.2f\n", t0 / double(t1));
-    printf("SSE (unrolled)  : x %0.2f\n", t0 / double(t2));
+    printf("SSE          : x %0.2f\n", t0 / double(t1));
+    printf("SSE (block)  : x %0.2f\n", t0 / double(t2));
+    printf("scalar (std) : x %0.2f\n", t0 / double(t3));
 
     const auto s0 = sum(result_signed.reference);
     const auto s1 = sum(result_signed.SSE);
-    printf("reference results: %lu %lu\n", s0, s1);
+    const auto s2 = sum(result_signed.SSEblock);
+    const auto s3 = sum(result_signed.std_scalar);
+    printf("reference results: %lu %lu %lu %lu\n", s0, s1, s2, s3);
 
-    if (s0 == s1) {
+    if (s0 == s1 && s0 == s2 && s0 == s3) {
         return true;
     } else {
         puts("FAILED");

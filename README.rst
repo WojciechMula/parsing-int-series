@@ -87,7 +87,6 @@ Important:
 * Provide low-level benchmarks that measure cycles (then must not use
   std::vector but a static array).
 * Make scalar hybrid parse signed numbers.
-* Provide scalar implementation that will use ``strtol``.
 * Complete AVX512 implementation to handle scalar fallback.
 
 Minor:

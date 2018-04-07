@@ -18,6 +18,7 @@ PARSER_UNSIGNED_HEADERS= \
 
 PARSER_SIGNED_HEADERS= \
     include/scalar/scalar-parse-signed.h \
+    include/scalar/std-parser-signed.h \
     include/sse/sse-parser-signed.h \
     include/sse/sse-parser-signed-unrolled.h
 
