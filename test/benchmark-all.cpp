@@ -13,6 +13,7 @@
 #include "sse/sse-parser-unsigned-unrolled.h"
 #include "sse/sse-parser-signed.h"
 #include "sse/sse-parser-signed-unrolled.h"
+#include "sse/sse-simplified-parser-signed.h"
 
 #include "application.h"
 
@@ -52,6 +53,7 @@ private:
         SignedVector SSE;
         SignedVector SSEblock;
         SignedVector std_scalar;
+        SignedVector SSEsimplified;
     } result_signed;
 
 private:
@@ -178,18 +180,31 @@ bool BenchmarkApp::run_signed() {
         }
     });
 
+    const auto t4 = measure_time("SSE (simplified): ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.SSEsimplified.clear();
+            sse_simplified::parse_signed(
+                tmp.data(), tmp.size(),
+                separators,
+                std::back_inserter(result_signed.SSEsimplified));
+        }
+    });
+
     puts("");
-    printf("SSE          : x %0.2f\n", t0 / double(t1));
-    printf("SSE (block)  : x %0.2f\n", t0 / double(t2));
-    printf("scalar (std) : x %0.2f\n", t0 / double(t3));
+    printf("SSE             : x %0.2f\n", t0 / double(t1));
+    printf("SSE (block)     : x %0.2f\n", t0 / double(t2));
+    printf("scalar (std)    : x %0.2f\n", t0 / double(t3));
+    printf("SSE (simplfied) : x %0.2f\n", t0 / double(t4));
 
     const auto s0 = sum(result_signed.reference);
     const auto s1 = sum(result_signed.SSE);
     const auto s2 = sum(result_signed.SSEblock);
     const auto s3 = sum(result_signed.std_scalar);
-    printf("reference results: %lu %lu %lu %lu\n", s0, s1, s2, s3);
+    const auto s4 = sum(result_signed.SSEsimplified);
+    printf("reference results: %lu %lu %lu %lu %lu\n", s0, s1, s2, s3, s4);
 
-    if (s0 == s1 && s0 == s2 && s0 == s3) {
+    if (s0 == s1 && s0 == s2 && s0 == s3 && s0 == s4) {
         return true;
     } else {
         puts("FAILED");

@@ -20,7 +20,8 @@ PARSER_SIGNED_HEADERS= \
     include/scalar/scalar-parse-signed.h \
     include/scalar/std-parser-signed.h \
     include/sse/sse-parser-signed.h \
-    include/sse/sse-parser-signed-unrolled.h
+    include/sse/sse-parser-signed-unrolled.h \
+    include/sse/sse-simplified-parser-signed.h
 
 PARSER_AVX512_HEADERS= \
     include/scalar/scalar-parse-signed.h \

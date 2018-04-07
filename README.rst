@@ -91,7 +91,6 @@ Important:
 
 Minor:
 
-* Nate's idea: let consider all non-digit and non-sign chars as separators.
 * Change the way hybrid generator is created (the generator's code is an eyesore).
 * Update inline help in ``benchmark``. It'd require redesign of the base class.
 
