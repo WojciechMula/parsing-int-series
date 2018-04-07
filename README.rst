@@ -84,8 +84,6 @@ TODO
 
 Important:
 
-* Provide low-level benchmarks that measure cycles (then must not use
-  std::vector but a static array).
 * Make scalar hybrid parse signed numbers.
 * Complete AVX512 implementation to handle scalar fallback.
 

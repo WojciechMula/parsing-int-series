@@ -55,7 +55,8 @@ UNITTESTS= \
 
 BENCHMARK= \
     bin/benchmark \
-    bin/benchmark-all
+    bin/benchmark-all \
+    bin/benchmark-cpuclock
 
 TEST= \
     bin/compare-signed \
@@ -85,6 +86,7 @@ obj/block_info.o: src/block_info.cpp src/block_info.inl include/block_info.h
 src/block_info.inl: scripts/generator.py scripts/writer.py
 	python $< $@
 
+
 # unit tests
 # --------------------------------------------------------------------------------
 bin/test-stni-matcher: test/unittest/test-stni-matcher.cpp include/sse/sse-matcher-stni.h
@@ -105,10 +107,14 @@ bin/verify_sse_unsigned_parser: test/unittest/verify_sse_unsigned_parser.cpp $(P
 
 # test programs
 # --------------------------------------------------------------------------------
+
 bin/benchmark: test/benchmark.cpp $(PARSER_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
 bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) include/hybrid-parser.h include/hybrid-parser.inl 
+	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
+
+bin/benchmark-cpuclocks: test/benchmark-cpuclocks.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
 bin/compare-signed: test/compare-signed.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
