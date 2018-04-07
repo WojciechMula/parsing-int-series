@@ -8,6 +8,7 @@ sse-dump.h
 *.o
 *.pyc
 report.rst
+report-short.rst
 measurements.txt
 
 perf.data

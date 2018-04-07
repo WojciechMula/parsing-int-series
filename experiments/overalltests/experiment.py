@@ -1,4 +1,9 @@
 import sys
+import os.path
+
+if __name__ == '__main__' and __package__ is None:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from testcases import testcases
 from runner import Runner, format_distribution
 
@@ -23,6 +28,7 @@ def test(file):
 
 def main():
     test(sys.stdout)
+
 
 if __name__ == '__main__':
     main()
