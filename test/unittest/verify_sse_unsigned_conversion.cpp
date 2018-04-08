@@ -38,15 +38,15 @@ public:
 
             using namespace sse;
 
-            if (b.conversion == Conversion::SSE1Digit) {
+            if (b.conversion_routine == Conversion::SSE1Digit) {
                 convert_1digit(shuffled, b.element_count, &result[0]);
-            } else if (b.conversion == Conversion::SSE2Digits) {
+            } else if (b.conversion_routine == Conversion::SSE2Digits) {
                 convert_2digits(shuffled, b.element_count, &result[0]);
-            } else if (b.conversion == Conversion::SSE3Digits) {
+            } else if (b.conversion_routine == Conversion::SSE3Digits) {
                 convert_3digits(shuffled, b.element_count, &result[0]);
-            } else if (b.conversion == Conversion::SSE4Digits) {
+            } else if (b.conversion_routine == Conversion::SSE4Digits) {
                 convert_4digits(shuffled, b.element_count, &result[0]);
-            } else if (b.conversion == Conversion::SSE8Digits) {
+            } else if (b.conversion_routine == Conversion::SSE8Digits) {
                 convert_8digits(shuffled, b.element_count, &result[0]);
             } else {
                 unsupported += 1;

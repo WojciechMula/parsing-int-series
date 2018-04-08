@@ -90,19 +90,19 @@ namespace avx512 {
 
                 const __m128i shuffled    = _mm_shuffle_epi8(chunk, shuffle_digits);
                 const __m128i negate_mask = _mm_cmpeq_epi8(_mm_shuffle_epi8(chunk, shuffle_signs), _mm_set1_epi8('-'));
-                if (bi.conversion == Conversion::SSE1Digit) {
+                if (bi.conversion_routine == Conversion::SSE1Digit) {
 
                     sse::convert_1digit(shuffled, bi.element_count, output);
 
-                } else if (bi.conversion == Conversion::SSE2Digits) {
+                } else if (bi.conversion_routine == Conversion::SSE2Digits) {
 
                     sse::convert_2digits_signed(shuffled, negate_mask, bi.element_count, output);
 
-                } else if (bi.conversion == Conversion::SSE4Digits) {
+                } else if (bi.conversion_routine == Conversion::SSE4Digits) {
 
                     sse::convert_4digits_signed(shuffled, negate_mask, bi.element_count, output);
 
-                } else if (bi.conversion == Conversion::SSE8Digits) {
+                } else if (bi.conversion_routine == Conversion::SSE8Digits) {
 
                     sse::convert_8digits_signed(shuffled, negate_mask, bi.element_count, output);
 

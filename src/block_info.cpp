@@ -40,7 +40,7 @@ void BlockInfo::dump(FILE* f) const {
     fprintf(f, "first_skip          : %d\n", first_skip);
     fprintf(f, "total_skip          : %d\n", total_skip);
     fprintf(f, "element_count       : %d\n", element_count);
-    fprintf(f, "conversion          : %s\n", to_string(conversion));
+    fprintf(f, "conversion          : %s\n", to_string(conversion_routine));
     fprintf(f, "invalid_sign_mask   : %04x\n", invalid_sign_mask);
     fprintf(f, "shuffle_digits      : "); as_array(f, shuffle_digits);
     fprintf(f, "shuffle_signs       : "); as_array(f, shuffle_signs);

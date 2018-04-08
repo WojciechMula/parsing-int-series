@@ -43,7 +43,7 @@ namespace sse_simplified {
 
             STATS_INC(loops);
 
-            if (sign_mask == 0 || bi.conversion == Conversion::SSE1Digit) {
+            if (sign_mask == 0 || bi.conversion_routine == Conversion::SSE1Digit) {
                 // unsigned path
                 return sse::detail::parse_unsigned(bi, input, data, end, output);
             } else {

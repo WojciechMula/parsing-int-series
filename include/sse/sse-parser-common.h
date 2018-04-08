@@ -18,21 +18,21 @@ namespace sse {
             const __m128i shuffle_digits = _mm_loadu_si128((const __m128i*)bi.shuffle_digits);
             const __m128i shuffled = _mm_shuffle_epi8(input, shuffle_digits);
 
-            if (bi.conversion == Conversion::SSE1Digit) {
+            if (bi.conversion_routine == Conversion::SSE1Digit) {
 
                 convert_1digit(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit1_calls);
                 STATS_ADD(unsigned_path.digit1_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE2Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE2Digits) {
 
                 convert_2digits(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit2_calls);
                 STATS_ADD(unsigned_path.digit2_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE3Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE3Digits) {
 
                 convert_3digits(shuffled, bi.element_count, output);
 
@@ -40,14 +40,14 @@ namespace sse {
                 //STATS_INC(unsigned_path.digit2_calls);
                 //STATS_ADD(unsigned_path.digit2_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE4Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE4Digits) {
 
                 convert_4digits(shuffled, bi.element_count, output);
 
                 STATS_INC(unsigned_path.digit4_calls);
                 STATS_ADD(unsigned_path.digit4_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE8Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE8Digits) {
 
                 convert_8digits(shuffled, bi.element_count, output);
 
@@ -101,18 +101,18 @@ namespace sse {
             const __m128i shuffled_signs = _mm_shuffle_epi8(input, shuffle_signs);
             const __m128i negate_mask    = _mm_cmpeq_epi8(shuffled_signs, ascii_minus);
 
-            if (bi.conversion == Conversion::SSE1Digit) {
+            if (bi.conversion_routine == Conversion::SSE1Digit) {
 
                 convert_1digit(shuffled, bi.element_count, output);
 
-            } else if (bi.conversion == Conversion::SSE2Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE2Digits) {
 
                 convert_2digits_signed(shuffled, negate_mask, bi.element_count, output);
 
                 STATS_INC(signed_path.digit2_calls);
                 STATS_ADD(signed_path.digit2_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE3Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE3Digits) {
 
                 convert_3digits_signed(shuffled, negate_mask, bi.element_count, output);
 
@@ -120,14 +120,14 @@ namespace sse {
                 //STATS_INC(signed_path.digit2_calls);
                 //STATS_ADD(signed_path.digit2_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE4Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE4Digits) {
 
                 convert_4digits_signed(shuffled, negate_mask, bi.element_count, output);
 
                 STATS_INC(signed_path.digit4_calls);
                 STATS_ADD(signed_path.digit4_converted, bi.element_count);
 
-            } else if (bi.conversion == Conversion::SSE8Digits) {
+            } else if (bi.conversion_routine == Conversion::SSE8Digits) {
 
                 convert_8digits_signed(shuffled, negate_mask, bi.element_count, output);
 

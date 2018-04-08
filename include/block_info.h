@@ -19,7 +19,7 @@ struct BlockInfo {
     uint8_t     first_skip;
     uint8_t     total_skip;
     uint8_t     element_count;
-    Conversion  conversion;
+    Conversion  conversion_routine;
     uint16_t    invalid_sign_mask;
     uint8_t     shuffle_digits[16];
     uint8_t     shuffle_signs[16];
