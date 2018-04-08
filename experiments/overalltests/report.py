@@ -1,6 +1,13 @@
+import sys
+import os.path
+
+if __name__ == '__main__' and __package__ is None:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from table import Table
 from loader import load, get_distribution_title, get_separator_title
 from utils import groupby
+from report_writer import RestWriter
 
 
 class Report(object):
@@ -140,3 +147,10 @@ class Report(object):
             assert False
 
 
+def main():
+    report = Report(sys.argv[1])
+    writer = RestWriter(sys.stdout, report.get())
+    writer.write(sys.argv[2])
+
+if __name__ == '__main__':
+    main()

@@ -158,16 +158,16 @@ include/hybrid-parser.inl: scripts/hybrid-generator.py
 # overall experiments
 # --------------------------------------------------------------------------------
 
-measurements.txt: bin/benchmark experiments/overalltests/experiment.py experiments/overalltests/testcases.py
+overall.txt: bin/benchmark experiments/overalltests/experiment.py experiments/overalltests/testcases.py
 	# this is a long-running procedure, it'd be better to see if the program really works
 	python experiments/overalltests/experiment.py | tee /tmp/$@
 	mv /tmp/$@ $@
 
-report.rst: measurements.txt experiments/overalltests/postprocess.py experiments/overalltests/report.py experiments/overalltests/report_writer.py
-	python experiments/overalltests/postprocess.py $< "^#*" > /tmp/$@
+report-overall.rst: overall.txt experiments/overalltests/report.py experiments/overalltests/report_writer.py
+	python experiments/overalltests/report.py $< "^#*" > /tmp/$@
 	mv /tmp/$@ $@
 
-report-short.rst: measurements.txt experiments/overalltests/average.py experiments/overalltests/average_writer.py
+report-overall-short.rst: overall.txt experiments/overalltests/average.py experiments/overalltests/average_writer.py
 	python experiments/overalltests/average.py $< "^#*" > /tmp/$@
 	mv /tmp/$@ $@
 

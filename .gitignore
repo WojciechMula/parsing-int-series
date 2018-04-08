@@ -9,9 +9,8 @@ sse-dump.h
 *.pyc
 
 # overall reports
-report.rst
-report-short.rst
-measurements.txt
+report-*.rst
+overall.txt
 
 # microbenchmarks
 microbenchmarks.txt
