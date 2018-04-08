@@ -10,9 +10,9 @@
 #include "hybrid-parser.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
-#include "sse/sse-parser-unsigned-unrolled.h"
+#include "sse/sse-block-parser-unsigned.h"
 #include "sse/sse-parser-signed.h"
-#include "sse/sse-parser-signed-unrolled.h"
+#include "sse/sse-block-parser-signed.h"
 #include "sse/sse-simplified-parser-signed.h"
 
 #include "application.h"
@@ -105,8 +105,8 @@ bool BenchmarkApp::run_unsigned() {
         while (k--) {
             result_unsigned.SSEblock.clear();
             sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_block(tmp.data(), tmp.size(), separators,
-                              std::move(matcher), std::back_inserter(result_unsigned.SSEblock));
+            sse::parser_block_unsigned(tmp.data(), tmp.size(), separators,
+                                       std::move(matcher), std::back_inserter(result_unsigned.SSEblock));
         }
     });
 
@@ -162,7 +162,7 @@ bool BenchmarkApp::run_signed() {
         while (k--) {
             result_signed.SSEblock.clear();
             sse::NaiveMatcher<8> matcher(separators);
-            sse::parser_signed_unrolled(
+            sse::parser_block_signed(
                 tmp.data(), tmp.size(),
                 separators,
                 std::move(matcher), std::back_inserter(result_signed.SSEblock));

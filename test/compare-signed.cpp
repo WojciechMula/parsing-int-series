@@ -6,7 +6,7 @@
 #include "scalar/scalar-parse-unsigned.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-signed.h"
-#include "sse/sse-parser-signed-unrolled.h"
+#include "sse/sse-block-parser-signed.h"
 
 #include "application.h"
 
@@ -37,14 +37,14 @@ private:
             input_string.size(),
             separators.c_str(),
             std::move(matcher),
-            std::back_inserter(result));
+            std::back_inserter(reference));
     }
 
-    void run_unrolled_sse_parser() {
+    void run_sse_block_parser() {
 
         sse::NaiveMatcher<8> matcher(separators.c_str());
         result.clear();
-        sse::parser_signed_unrolled(
+        sse::parser_block_signed(
             input_string.data(),
             input_string.size(),
             separators.c_str(),
@@ -78,8 +78,8 @@ bool CompareApp::run() {
         return false;
     }
 
-    puts("Checking unrolled SSE parser");
-    run_unrolled_sse_parser();
+    puts("Checking SSE block parser");
+    run_sse_block_parser();
     if (!compare(reference, result)) {
         puts(input_string.c_str());
         puts("");

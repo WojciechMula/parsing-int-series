@@ -85,13 +85,13 @@ class Report(object):
                 loops,
                 get_time("scalar"),
                 get_time("sse"),
-                get_time("sse-unrolled"),
+                get_time("sse-block"),
             ))
 
         data.sort(key=lambda t: t[0]) # sort by size
 
         t = Table()
-        t.add_header([("input", 2), "scalar", ("SSE", 2), ("SSE unrolled", 2)])
+        t.add_header([("input", 2), "scalar", ("SSE", 2), ("SSE block", 2)])
         t.add_header(["size [B]", "loops", "time [us]", "time [us]", "speed-up", "time [us]", "speed-up"])
 
         for item in data:
@@ -101,10 +101,10 @@ class Report(object):
             if t0 < 10 and t1 < 10 and t2 < 10:
                 # don't fool people when all measurements are single-digit numbers
                 speedup_sse = '---'
-                speedup_sse_unrolled = '---'
+                speedup_sse_block = '---'
             else:
                 speedup_sse = '%0.2f' % (float(t0)/t1)
-                speedup_sse_unrolled = '%0.2f' % (float(t0)/t2)
+                speedup_sse_block = '%0.2f' % (float(t0)/t2)
 
             t.add_row([
                 '{:,}'.format(item[0]),
@@ -113,7 +113,7 @@ class Report(object):
                 '%d' % item[3],
                 speedup_sse,
                 '%d' % item[4],
-                speedup_sse_unrolled,
+                speedup_sse_block,
             ])
         
         return t

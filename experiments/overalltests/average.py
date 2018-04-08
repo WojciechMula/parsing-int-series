@@ -48,24 +48,24 @@ class Report(object):
 
             t0 = get_time("scalar")
             t1 = get_time("sse")
-            t2 = get_time("sse-unrolled")
+            t2 = get_time("sse-block")
 
             if t0 < 10 and t1 < 10 and t2 < 10:
                 # don't fool people when all measurements are single-digit numbers
                 continue
 
             speedup_sse = float(t0)/t1
-            speedup_sse_unrolled = float(t0)/t2
+            speedup_sse_block = float(t0)/t2
 
             key = (size, loops)
             if key not in data:
                 data[key] = [[], []]
             
             data[key][0].append(speedup_sse)
-            data[key][1].append(speedup_sse_unrolled)
+            data[key][1].append(speedup_sse_block)
 
         t = Table()
-        t.add_header([("input", 2), ("SSE speed-up", 3), ("SSE unrolled speed-up", 3)])
+        t.add_header([("input", 2), ("SSE speed-up", 3), ("SSE block speed-up", 3)])
         t.add_header(["size [B]", "loops", "min", "avg", "max", "min", "avg", "max"])
 
         def stats(numbers):
@@ -78,7 +78,7 @@ class Report(object):
             key = size, loops
 
             sse = stats(data[key][0])
-            sse_unrolled = stats(data[key][1])
+            sse_block = stats(data[key][1])
 
             t.add_row([
                 '{:,}'.format(size),
@@ -88,9 +88,9 @@ class Report(object):
                 '%0.2f' % sse[1],
                 '%0.2f' % sse[2],
 
-                '%0.2f' % sse_unrolled[0],
-                '%0.2f' % sse_unrolled[1],
-                '%0.2f' % sse_unrolled[2],
+                '%0.2f' % sse_block[0],
+                '%0.2f' % sse_block[1],
+                '%0.2f' % sse_block[2],
             ])
         
         return t

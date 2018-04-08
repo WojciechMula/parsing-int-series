@@ -14,13 +14,13 @@ PARSER_COMMON_HEADERS= \
 PARSER_UNSIGNED_HEADERS= \
     include/scalar/scalar-parse-unsigned.h \
     include/sse/sse-parser-unsigned.h \
-    include/sse/sse-parser-unsigned-unrolled.h
+    include/sse/sse-block-parser-unsigned.h
 
 PARSER_SIGNED_HEADERS= \
     include/scalar/scalar-parse-signed.h \
     include/scalar/std-parser-signed.h \
     include/sse/sse-parser-signed.h \
-    include/sse/sse-parser-signed-unrolled.h \
+    include/sse/sse-block-parser-signed.h \
     include/sse/sse-simplified-parser-signed.h
 
 PARSER_AVX512_HEADERS= \
@@ -56,7 +56,7 @@ UNITTESTS= \
 BENCHMARK= \
     bin/benchmark \
     bin/benchmark-all \
-    bin/benchmark-cpuclock
+    bin/benchmark-cpuclocks
 
 TEST= \
     bin/compare-signed \

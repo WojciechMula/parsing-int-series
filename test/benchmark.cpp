@@ -8,9 +8,9 @@
 #include "scalar/scalar-parse-unsigned.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
-#include "sse/sse-parser-unsigned-unrolled.h"
+#include "sse/sse-block-parser-unsigned.h"
 #include "sse/sse-parser-signed.h"
-#include "sse/sse-parser-signed-unrolled.h"
+#include "sse/sse-block-parser-signed.h"
 
 #include "application.h"
 
@@ -21,7 +21,7 @@ class BenchmarkApp: public Application {
     enum class Procedure {
         Scalar,
         SSE,
-        SSEUnrolled
+        SSEBlock
     };
 
     std::string procedure_name;
@@ -77,10 +77,10 @@ BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {
         procedure = Procedure::Scalar;
     } else if (procedure_name == "sse") {
         procedure = Procedure::SSE;
-    } else if (procedure_name == "sse-unrolled") {
-        procedure = Procedure::SSEUnrolled;
+    } else if (procedure_name == "sse-block") {
+        procedure = Procedure::SSEBlock;
     } else {
-        throw ArgumentError("Unknown procedure name. It must be: 'scalar', 'sse', 'sse-unrolled'");
+        throw ArgumentError("Unknown procedure name. It must be: 'scalar', 'sse', 'sse-block'");
     }
 }
 
@@ -112,10 +112,10 @@ void BenchmarkApp::run() {
                 });
             break;
 
-        case Procedure::SSEUnrolled:
+        case Procedure::SSEBlock:
             time = measure_time([this] {
                     sse::NaiveMatcher<8> matcher(get_separators_set().c_str());
-                    sse::parser_signed_unrolled(
+                    sse::parser_block_signed(
                         tmp.data(),
                         tmp.size(),
                         get_separators_set().c_str(),

@@ -13,7 +13,7 @@
 namespace sse {
 
     template <typename MATCHER, typename INSERTER>
-    void parser_block(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
+    void parser_block_unsigned(const char* string, size_t size, const char* separators, MATCHER matcher, INSERTER output) {
 
         char* data = const_cast<char*>(string);
         char* end  = data + size;

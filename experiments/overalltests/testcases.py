@@ -22,7 +22,7 @@ def testcases():
 procedures = [
     'scalar',
     'sse',
-    'sse-unrolled'
+    'sse-block'
 ]
 
 sizes = [

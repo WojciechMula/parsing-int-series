@@ -66,7 +66,7 @@ namespace sse {
     } // namespace detail
 
     template <typename MATCHER, typename INSERTER>
-    void parser_signed_unrolled(
+    void parser_block_signed(
         const char* string,
         size_t size,
         const char* separators,

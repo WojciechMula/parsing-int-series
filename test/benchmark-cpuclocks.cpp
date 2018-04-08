@@ -8,7 +8,7 @@
 #include "scalar/std-parser-signed.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-signed.h"
-#include "sse/sse-parser-signed-unrolled.h"
+#include "sse/sse-block-parser-signed.h"
 #include "sse/sse-simplified-parser-signed.h"
 
 #include "application.h"
@@ -77,7 +77,7 @@ bool BenchmarkApp::run() {
         sse::NaiveMatcher<8> matcher(separators);,
 
         // test:
-        sse::parser_signed_unrolled(
+        sse::parser_block_signed(
             tmp.data(), tmp.size(),
             separators,
             std::move(matcher), std::back_inserter(result_signed.SSEblock));,
