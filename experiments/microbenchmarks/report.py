@@ -19,9 +19,9 @@ class Report(object):
         bysize = lambda item: item.size
         data = groupby(data, bysize)
         self.report = []
-        for size, collection in data.iteritems():
-
-            sortby = lambda item: (item.num_distribution, item.sep_distribution)
+        for size in sorted(data):
+            collection = data[size]
+            sortby = lambda item: (item.distribution_name, item.num_distribution, item.sep_distribution)
             collection.sort(key=sortby)
 
             res = []
