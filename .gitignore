@@ -7,9 +7,15 @@ sse-dump.h
 # the rest
 *.o
 *.pyc
+
+# overall reports
 report.rst
 report-short.rst
 measurements.txt
+
+# microbenchmarks
+microbenchmarks.txt
+microbenchmarks.rst
 
 perf.data
 perf.data.old

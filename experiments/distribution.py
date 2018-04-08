@@ -29,3 +29,4 @@ def normal_distribution(mu, sigma, count = 8):
 
     return tmp
 
+

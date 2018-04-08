@@ -155,7 +155,7 @@ include/hybrid-parser.inl: scripts/hybrid-generator.py
 	python $< > $@
 
 
-# experiments
+# overall experiments
 # --------------------------------------------------------------------------------
 
 measurements.txt: bin/benchmark experiments/overalltests/experiment.py experiments/overalltests/testcases.py
@@ -169,5 +169,17 @@ report.rst: measurements.txt experiments/overalltests/postprocess.py experiments
 
 report-short.rst: measurements.txt experiments/overalltests/average.py experiments/overalltests/average_writer.py
 	python experiments/overalltests/average.py $< "^#*" > /tmp/$@
+	mv /tmp/$@ $@
+
+# microbenchmarks
+# --------------------------------------------------------------------------------
+
+microbenchmarks.txt: bin/benchmark-cpuclocks experiments/microbenchmarks/experiment.py experiments/microbenchmarks/testcases.py
+	# this is a long-running procedure, it'd be better to see if the program really works
+	python experiments/microbenchmarks/experiment.py | tee /tmp/$@
+	mv /tmp/$@ $@
+
+microbenchmarks.rst: microbenchmarks.txt experiments/microbenchmarks/report.py experiments/microbenchmarks/writer.py
+	python experiments/microbenchmarks/report.py $< "^#" > /tmp/$@
 	mv /tmp/$@ $@
 
