@@ -28,24 +28,3 @@ def load(file):
 
     return L
 
-
-def get_distribution_title(distribution_name):
-    if distribution_name == 'single':
-        return 'Fixed length'
-    elif distribution_name == 'normal':
-        return 'Guassian distribution'
-    elif distribution_name == 'uniform':
-        return 'Uniform distribution'
-    else:
-        assert False
-
-
-def get_separator_title(sep_distribution):
-    if sep_distribution == '1':
-        separator = 'Single separator character'
-    else:
-        k = len(sep_distribution.split(','))
-        separator = '1 .. %d separator characters' % k
-
-    return separator
-

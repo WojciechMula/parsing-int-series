@@ -5,9 +5,10 @@ if __name__ == '__main__' and __package__ is None:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from table import Table
-from loader import load, get_distribution_title, get_separator_title
+from loader import load
 from utils import groupby
 from report_writer import RestWriter
+from prettyprint import *
 
 
 class Report(object):
@@ -53,11 +54,11 @@ class Report(object):
         result = []
         for key, collection in groupby(collection, byparam).iteritems():
             table = self.prepare_table(collection)
-            n, title = self.parameters_title(distribution_name, key)
+            ret   = get_num_distribution_parameters(distribution_name, key)
             result.append((
-                title,
+                ret.title,
                 table,
-                n
+                ret.weight
             ))
 
         result.sort(key=lambda row: row[-1])
@@ -118,39 +119,17 @@ class Report(object):
         return t
 
 
-    def parameters_title(self, distribution_name, num_distribution):
-
-        distr = map(int, num_distribution.split(','))
-        def format_count(count, noun):
-            if count == 1:
-                return '%d %s' % (count, noun)
-            else:
-                return '%d %ss' % (count, noun)
-
-        if distribution_name == 'single':
-            def get_fixed():
-                return distr.index(1) + 1
-
-            n = get_fixed()
-            return (n, format_count(n, 'digit'))
-
-        elif distribution_name == 'normal':
-            def get_max():
-                return distr.index(max(distr)) + 1
-
-            n = get_max()
-            return (n, "max at %d digit" % n)
-        elif distribution_name == 'uniform':
-            n = len(distr)
-            return (n, "1 .. %s" % format_count(n, 'digit'))
-        else:
-            assert False
 
 
 def main():
     report = Report(sys.argv[1])
     writer = RestWriter(sys.stdout, report.get())
-    writer.write(sys.argv[2])
+    try:
+        restsection = sys.argv[2]
+    except IndexError:
+        restsection = "-~#"
+
+    writer.write(restsection)
 
 if __name__ == '__main__':
     main()

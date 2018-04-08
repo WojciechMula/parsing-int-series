@@ -4,7 +4,7 @@ class RestWriter(object):
         self.report = report
 
 
-    def write(self, restsection="-~#"):
+    def write(self, restsection):
 
         assert len(restsection) >= 3
 
