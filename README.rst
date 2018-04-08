@@ -23,11 +23,12 @@ Usage
 
 Type ``make`` to build all programs.
 
-Type ``make report.rst`` to create detailed performance comparison for
-the current machine. It might take a few minutes to complete.
-
 Type ``make run-tests`` to build all unit tests and then run them.
 Some tests are time consuming, be patient.
+
+Type ``make microbenchmarks.rst`` to run benchmarks.
+
+Type ``make report-overall.rst`` to run performance benchmarks.
 
 
 Programs
@@ -36,6 +37,8 @@ Programs
 There are several programs available in ``bin`` subdirectory.
 
 * ``benchmark`` --- test performance of given procedure
+* ``benchmark-cpuclocks`` --- measure performance of all procedures; display
+  CPU clocks
 * ``benchmark-all`` --- compare performance of different procedures
 * ``compare-singed`` and ``comapre-unsigned`` --- are used to
   validate if parsers produces the same results as the reference
