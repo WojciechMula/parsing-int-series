@@ -92,7 +92,6 @@ Important:
 
 Minor:
 
-* Change the way hybrid generator is created (the generator's code is an eyesore).
 * Update inline help in ``benchmark``. It'd require redesign of the base class.
 
 License

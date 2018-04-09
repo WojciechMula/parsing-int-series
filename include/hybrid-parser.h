@@ -46,13 +46,13 @@ void hybrid_parser(const char* string, size_t size, const char* separators, MATC
         }
 
         switch (digit_mask & 0xff) {
-            #include "hybrid-parser.inl"
+            #include "hybrid-parser-unsigned.inl"
         }
 
         data += 8;
 
         switch (digit_mask >> 8) {
-            #include "hybrid-parser.inl"
+            #include "hybrid-parser-unsigned.inl"
         }
 
         data += 8;
