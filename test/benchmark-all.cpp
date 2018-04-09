@@ -8,6 +8,7 @@
 #include "scalar/scalar-parse-unsigned.h"
 #include "scalar/std-parser-signed.h"
 #include "hybrid-parser.h"
+#include "hybrid-parser-signed.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-unsigned.h"
 #include "sse/sse-block-parser-unsigned.h"
@@ -54,6 +55,7 @@ private:
         SignedVector SSEblock;
         SignedVector std_scalar;
         SignedVector SSEsimplified;
+        SignedVector scalar_hybrid;
     } result_signed;
 
 private:
@@ -110,15 +112,16 @@ bool BenchmarkApp::run_unsigned() {
         }
     });
 
-    puts("");
-    printf("hybrid      speed-up: %0.2f\n", t0 / double(t1));
-    printf("SSE         speed-up: %0.2f\n", t0 / double(t2));
-    printf("SSE (block) speed-up: %0.2f\n", t0 / double(t3));
-
     const auto s0 = sum(result_unsigned.reference);
     const auto s1 = sum(result_unsigned.hybrid);
     const auto s2 = sum(result_unsigned.SSE);
     const auto s3 = sum(result_unsigned.SSEblock);
+
+    puts("");
+    printf("hybrid      speed-up: %0.2f %s\n", t0 / double(t1), s0 == s1 ? "" : "FAILED");
+    printf("SSE         speed-up: %0.2f %s\n", t0 / double(t2), s0 == s2 ? "" : "FAILED");
+    printf("SSE (block) speed-up: %0.2f %s\n", t0 / double(t3), s0 == s3 ? "" : "FAILED");
+
     printf("reference results: %lu %lu %lu %lu\n", s0, s1, s2, s3);
 
     if (s0 == s1 && s0 == s2 && s0 == s3) {
@@ -191,20 +194,35 @@ bool BenchmarkApp::run_signed() {
         }
     });
 
-    puts("");
-    printf("SSE             : x %0.2f\n", t0 / double(t1));
-    printf("SSE (block)     : x %0.2f\n", t0 / double(t2));
-    printf("scalar (std)    : x %0.2f\n", t0 / double(t3));
-    printf("SSE (simplfied) : x %0.2f\n", t0 / double(t4));
+    const auto t5 = measure_time("scalar (hybrid): ", [this, separators] {
+        auto k = get_loop_count();
+        while (k--) {
+            result_signed.scalar_hybrid.clear();
+            sse::NaiveMatcher<8> matcher(separators);
+            parser_hybrid_signed(
+                tmp.data(), tmp.size(),
+                separators,
+                std::move(matcher),
+                std::back_inserter(result_signed.scalar_hybrid));
+        }
+    });
 
     const auto s0 = sum(result_signed.reference);
     const auto s1 = sum(result_signed.SSE);
     const auto s2 = sum(result_signed.SSEblock);
     const auto s3 = sum(result_signed.std_scalar);
     const auto s4 = sum(result_signed.SSEsimplified);
-    printf("reference results: %lu %lu %lu %lu %lu\n", s0, s1, s2, s3, s4);
+    const auto s5 = sum(result_signed.scalar_hybrid);
 
-    if (s0 == s1 && s0 == s2 && s0 == s3 && s0 == s4) {
+    puts("");
+    printf("SSE              : x %0.2f %s\n", t0 / double(t1), s0 == s1 ? "" : "FAILED");
+    printf("SSE (block)      : x %0.2f %s\n", t0 / double(t2), s0 == s2 ? "" : "FAILED");
+    printf("scalar (std)     : x %0.2f %s\n", t0 / double(t3), s0 == s3 ? "" : "FAILED");
+    printf("SSE (simplified) : x %0.2f %s\n", t0 / double(t4), s0 == s4 ? "" : "FAILED");
+    printf("scalar (hybrid)  : x %0.2f %s\n", t0 / double(t5), s0 == s5 ? "" : "FAILED");
+    printf("reference results: %lu %lu %lu %lu %lu %lu\n", s0, s1, s2, s3, s4, s5);
+
+    if (s0 == s1 && s0 == s2 && s0 == s3 && s0 == s4 && s0 == s5) {
         return true;
     } else {
         puts("FAILED");

@@ -111,7 +111,7 @@ bin/verify_sse_unsigned_parser: test/unittest/verify_sse_unsigned_parser.cpp $(P
 bin/benchmark: test/benchmark.cpp $(PARSER_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
-bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) include/hybrid-parser.h include/hybrid-parser-unsigned.inl 
+bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) include/hybrid-parser.h include/hybrid-parser-unsigned.inl include/hybrid-parser-signed.h include/hybrid-parser-signed.inl  include/hybrid-shift-back.inl 
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
 bin/benchmark-cpuclocks: test/benchmark-cpuclocks.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
@@ -152,6 +152,12 @@ obj/sse-parser-statistics.o: src/sse-parser-statistics.cpp include/sse/sse-parse
 # --------------------------------------------------------------------------------
 
 include/hybrid-parser-unsigned.inl: scripts/hybrid-unsigned.py scripts/hybrid.py
+	python $< > $@
+
+include/hybrid-parser-signed.inl: scripts/hybrid-signed.py scripts/hybrid.py
+	python $< > $@
+
+include/hybrid-shift-back.inl: scripts/hybrid-shift-back.py scripts/hybrid.py
 	python $< > $@
 
 

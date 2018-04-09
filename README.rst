@@ -87,7 +87,6 @@ TODO
 
 Important:
 
-* Make scalar hybrid parse signed numbers.
 * Complete AVX512 implementation to handle scalar fallback.
 
 Minor:
