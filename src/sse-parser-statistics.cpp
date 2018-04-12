@@ -55,6 +55,8 @@ void sse::Statistics::print(FILE* file) const {
     print_sse_statistics(file, "1-digit vector conversions (unsigned)", unsigned_path.digit1_calls, unsigned_path.digit1_converted);
     print_sse_statistics(file, "2-digit vector conversions (unsigned)", unsigned_path.digit2_calls, unsigned_path.digit2_converted);
     print_sse_statistics(file, "2-digit vector conversions (signed)",   signed_path.digit2_calls,   signed_path.digit2_converted);
+    print_sse_statistics(file, "3-digit vector conversions (unsigned)", unsigned_path.digit3_calls, unsigned_path.digit3_converted);
+    print_sse_statistics(file, "3-digit vector conversions (signed)",   signed_path.digit3_calls,   signed_path.digit3_converted);
     print_sse_statistics(file, "4-digit vector conversions (unsigned)", unsigned_path.digit4_calls, unsigned_path.digit4_converted);
     print_sse_statistics(file, "4-digit vector conversions (signed)",   signed_path.digit4_calls,   signed_path.digit4_converted);
     print_sse_statistics(file, "8-digit vector conversions (unsigned)", unsigned_path.digit8_calls, unsigned_path.digit8_converted);

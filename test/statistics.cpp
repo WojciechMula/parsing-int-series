@@ -60,6 +60,9 @@ int main(int argc, char* argv[]) {
         StatisticsApp app(argc, argv);
 
         app.run();
+#ifndef USE_STATISTICS
+        puts("Program was not compiled with USE_STATISTICS");
+#endif
         return EXIT_SUCCESS;
 
     } catch (std::exception& e) {

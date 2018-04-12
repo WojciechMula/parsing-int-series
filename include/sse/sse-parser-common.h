@@ -36,9 +36,8 @@ namespace sse {
 
                 convert_3digits(shuffled, bi.element_count, output);
 
-                //TODO
-                //STATS_INC(unsigned_path.digit2_calls);
-                //STATS_ADD(unsigned_path.digit2_converted, bi.element_count);
+                STATS_INC(unsigned_path.digit3_calls);
+                STATS_ADD(unsigned_path.digit3_converted, bi.element_count);
 
             } else if (bi.conversion_routine == Conversion::SSE4Digits) {
 
@@ -116,9 +115,8 @@ namespace sse {
 
                 convert_3digits_signed(shuffled, negate_mask, bi.element_count, output);
 
-                //TODO
-                //STATS_INC(signed_path.digit2_calls);
-                //STATS_ADD(signed_path.digit2_converted, bi.element_count);
+                STATS_INC(signed_path.digit3_calls);
+                STATS_ADD(signed_path.digit3_converted, bi.element_count);
 
             } else if (bi.conversion_routine == Conversion::SSE4Digits) {
 

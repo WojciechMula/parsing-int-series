@@ -20,6 +20,8 @@ namespace sse {
         size_t digit1_converted = 0;
         size_t digit2_calls = 0;
         size_t digit2_converted = 0;
+        size_t digit3_calls = 0;
+        size_t digit3_converted = 0;
         size_t digit4_calls = 0;
         size_t digit4_converted = 0;
         size_t digit8_calls = 0;
@@ -33,6 +35,7 @@ namespace sse {
         size_t get_SSE_converted() const {
             return digit1_converted
                  + digit2_converted
+                 + digit3_converted
                  + digit4_converted
                  + digit8_converted;
         }
