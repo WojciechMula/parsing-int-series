@@ -24,6 +24,13 @@ PARSER_SIGNED_HEADERS= \
     include/sse/sse-block-parser-signed.h \
     include/sse/sse-simplified-parser-signed.h
 
+PARSER_HYBRID_DEPS= \
+    include/hybrid-parser.h \
+    include/hybrid-parser-unsigned.inl \
+    include/hybrid-parser-signed.h \
+    include/hybrid-parser-signed.inl \
+    include/hybrid-shift-back.inl
+
 PARSER_AVX512_HEADERS= \
     include/scalar/scalar-parse-signed.h \
     include/sse/sse-parser-signed.h \
@@ -112,10 +119,10 @@ bin/verify_sse_unsigned_parser: test/unittest/verify_sse_unsigned_parser.cpp $(P
 bin/benchmark: test/benchmark.cpp $(PARSER_DEPS) $(CMDLINE_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
-bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) include/hybrid-parser.h include/hybrid-parser-unsigned.inl include/hybrid-parser-signed.h include/hybrid-parser-signed.inl  include/hybrid-shift-back.inl 
+bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) $(PARSER_HYBRID_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
-bin/benchmark-cpuclocks: test/benchmark-cpuclocks.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
+bin/benchmark-cpuclocks: test/benchmark-cpuclocks.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS) $(PARSER_HYBRID_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
 bin/compare-signed: test/compare-signed.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
