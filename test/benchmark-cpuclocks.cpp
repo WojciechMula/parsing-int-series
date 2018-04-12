@@ -6,6 +6,7 @@
 
 #include "benchmark.h"
 #include "scalar/std-parser-signed.h"
+#include "hybrid-parser-signed.h"
 #include "sse/sse-matcher.h"
 #include "sse/sse-parser-signed.h"
 #include "sse/sse-block-parser-signed.h"
@@ -32,6 +33,7 @@ private:
         SignedVector SSEblock;
         SignedVector std_scalar;
         SignedVector SSEsimplified;
+        SignedVector hybrid;
     } result_signed;
 };
 
@@ -113,6 +115,19 @@ bool BenchmarkApp::run() {
             std::back_inserter(result_signed.SSEsimplified));,
 
         "SSE (simplified)",
+        repeat,
+        size
+    );
+
+    BEST_TIME(
+        // pre:
+        result_signed.hybrid.clear();
+        sse::NaiveMatcher<8> matcher(separators);,
+
+        // test:
+        parser_hybrid_signed(tmp.data(), tmp.size(), separators,
+                             std::move(matcher), std::back_inserter(result_signed.hybrid)),
+        "scalar (hybrid)",
         repeat,
         size
     );
