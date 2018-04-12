@@ -4,6 +4,8 @@
 #include <cstring>
 #include <stdexcept>
 
+#include "scalar-parse-common.h"
+
 namespace scalar {
 
     template <typename INSERTER>
@@ -17,7 +19,7 @@ namespace scalar {
             if (c >= '0' && c <= '9') {
                 result = 10 * result + (c - '0');
                 digits += 1;
-            } else if (strchr(separators, c) != nullptr) {
+            } else if (contains(separators, c)) {
                 if (digits > 0) {
                     *output++ = result;
                     result = 0;

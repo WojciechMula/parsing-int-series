@@ -5,6 +5,7 @@ FLAGS:=$(FLAGS) -Iinclude -Iinclude/test
 
 PARSER_COMMON_HEADERS= \
     include/block_info.h \
+    include/scalar/scalar-parse-common.h\
     include/sse/sse-utils.h \
     include/sse/sse-convert.h \
     include/sse/sse-matcher.h \

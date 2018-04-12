@@ -4,6 +4,8 @@
 #include <cstring>
 #include <stdexcept>
 
+#include "scalar-parse-common.h"
+
 namespace scalar {
 
     template <typename INSERTER>
@@ -29,7 +31,7 @@ namespace scalar {
                 state = Minus;
             } else if (c >= '0' && c <= '9') {
                 state = Digit;
-            } else if (strchr(separators, c) != nullptr) {
+            } else if (contains(separators, c)) {
                 state = Separator;
             } else {
                 throw std::runtime_error("Wrong character (scalar)");
