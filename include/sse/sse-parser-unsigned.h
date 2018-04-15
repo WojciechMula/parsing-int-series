@@ -25,6 +25,7 @@ namespace sse {
             const uint16_t valid_mask = _mm_movemask_epi8(matcher.get_mask(input, t0));
 
             STATS_INC(loops);
+            STATS_SPAN_MASK(digit_mask);
 
             if (valid_mask != 0xffff) {
                 throw std::runtime_error("Wrong character");

@@ -35,6 +35,7 @@ namespace sse {
 
             const uint16_t sign_mask = _mm_movemask_epi8(bytemask_sign);
             const uint16_t span_mask = _mm_movemask_epi8(bytemask_span);
+            STATS_SPAN_MASK(span_mask);
             const BlockInfo& bi      = blocks[span_mask];
             if (sign_mask & bi.invalid_sign_mask) {
                 throw std::runtime_error("'+' or '-' at invalid position");

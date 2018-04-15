@@ -6,9 +6,11 @@
 #ifdef USE_STATISTICS
 #define STATS_ADD(__field__, val) sse::stats.__field__ += (val)
 #define STATS_INC(__field__) STATS_ADD(__field__, 1)
+#define STATS_SPAN_MASK(mask) sse::stats.span_masks_histogram[mask] += 1
 #else
 #define STATS_ADD(__field__, val)
 #define STATS_INC(__field__)
+#define STATS_SPAN_MASK(mask)
 #endif
 
 namespace sse {
@@ -44,6 +46,7 @@ namespace sse {
     struct Statistics {
 
         std::map<int, size_t> total_skip_histogram;
+        std::map<uint16_t, size_t> span_masks_histogram;
 
         size_t loops = 0;
 
