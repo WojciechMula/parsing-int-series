@@ -5,7 +5,11 @@ class Parameters(object):
 
 def get_num_distribution_parameters(distribution_name, num_distribution):
 
-    distr = map(int, num_distribution.split(','))
+    if type(num_distribution) is str:
+        distr = map(int, num_distribution.split(','))
+    else:
+        distr = num_distribution
+
     def format_count(count, noun):
         if count == 1:
             return '%d %s' % (count, noun)
@@ -45,10 +49,15 @@ def get_distribution_title(distribution_name):
 
 
 def get_separator_title(sep_distribution):
-    if sep_distribution == '1':
+    if type(sep_distribution) is str:
+        sep = sep_distribution.split(',')
+    else:
+        sep = sep_distribution
+
+    if sep == [1]:
         separator = 'single separator character'
     else:
-        k = len(sep_distribution.split(','))
+        k = len(sep)
         separator = '1 .. %d separator characters' % k
 
     return separator

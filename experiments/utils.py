@@ -9,3 +9,15 @@ def groupby(sequence, keyfun):
 
     return d
 
+def splitsorted(sequence, keyfun):
+    prev = None
+    result = []
+    for item in sequence:
+        val = keyfun(item)
+        if val != prev:
+            result.append([])
+            prev = val
+
+        result[-1].append(item)
+
+    return result
