@@ -1,6 +1,7 @@
 #include "sse/sse-parser-statistics.h"
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 sse::Statistics sse::stats; // a global object
 
@@ -106,4 +107,14 @@ void sse::Statistics::print(FILE* file) const {
 sse::Statistics::Statistics() {
     for (int i=0; i <= 16; i++)
         total_skip_histogram[i] = 0;
+}
+
+void sse::Statistics::span_mask_histogram_to_csv(FILE* file) const {
+    assert(file != nullptr);
+
+    for (const auto& item: stats.span_masks_histogram) {
+        const uint16_t mask  = item.first;
+        const size_t   count = item.second;
+        fprintf(file, "%02x, %lu\n", mask, count);
+    }
 }

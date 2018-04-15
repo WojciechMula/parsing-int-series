@@ -71,6 +71,7 @@ namespace sse {
         }
 
         void print(FILE* file) const;
+        void span_mask_histogram_to_csv(FILE* file) const;
 
         void print() const {
             print(stdout);

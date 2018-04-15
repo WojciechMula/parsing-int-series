@@ -30,6 +30,18 @@ void StatisticsApp::run() {
     } else {
         run_unsigned();
     }
+
+    const auto path = cmdline.get_value("--histogram-file", "");
+    if (!path.empty()) {
+        FILE* f = fopen(path.c_str(), "wt");
+        if (f != NULL) {
+            sse::stats.span_mask_histogram_to_csv(f);
+            fclose(f);
+            printf("Span mask histogram was written to '%s'\n", path.c_str());
+        } else {
+            printf("Can't open '%s': %s\n", path.c_str(), strerror(errno));
+        }
+    }
 }
 
 void StatisticsApp::run_unsigned() {
