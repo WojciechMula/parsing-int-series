@@ -34,8 +34,14 @@ private:
     std::random_device rd;
     std::mt19937 random;
 
+public:
+    bool run();
+
 protected:
     Application(int argc, char* argv[]);
+
+    virtual bool custom_run() = 0;
+    virtual void custom_init();
 
     bool has_signed_distribution() const {
         return sign_nonnull;
@@ -56,7 +62,11 @@ public:
         return loop_count;
     }
 
+protected:
+    virtual void print_custom_help() const;
+
 private:
+    void init();
     void print_help() const;
 };
 

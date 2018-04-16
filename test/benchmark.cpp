@@ -30,8 +30,10 @@ class BenchmarkApp: public Application {
 public:
     BenchmarkApp(int argc, char** argv);
 
-public:
-    void run();
+protected:
+    virtual bool custom_run() override;
+    virtual void custom_init() override;
+    virtual void print_custom_help() const override;
 
 private:
     Vector result;
@@ -66,8 +68,10 @@ private:
 
 };
 
-BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {
+BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
 
+
+void BenchmarkApp::custom_init() {
     procedure_name = cmdline.get_value("--procedure", "");
     if (procedure_name.empty()) {
         throw ArgumentError("Procedure name must not be empty");
@@ -85,8 +89,12 @@ BenchmarkApp::BenchmarkApp(int argc, char** argv) : Application(argc, argv) {
 }
 
 
+void BenchmarkApp::print_custom_help() const {
+    puts("--procedure=NAME where name is 'scalar', sse' or 'sse-block'");
+}
 
-void BenchmarkApp::run() {
+
+bool BenchmarkApp::custom_run() {
 
     tmp = generate_signed();
 
@@ -137,6 +145,8 @@ void BenchmarkApp::run() {
     printf("time       : %ld us\n", time);
     // this prevents compiler from optimizing out the benchmark loop
     printf("reference results: %lu\n", sum(result));
+
+    return true;
 }
 
 

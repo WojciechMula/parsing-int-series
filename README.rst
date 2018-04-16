@@ -89,9 +89,6 @@ Important:
 
 * Complete AVX512 implementation to handle scalar fallback.
 
-Minor:
-
-* Update inline help in ``benchmark``. It'd require redesign of the base class.
 
 License
 --------------------------------------------------------------------------------

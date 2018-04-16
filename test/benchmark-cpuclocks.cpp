@@ -21,8 +21,8 @@ class BenchmarkApp: public Application {
 public:
     BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
 
-public:
-    bool run();
+private:
+    virtual bool custom_run() override;
 
 private:
     std::string tmp;
@@ -37,7 +37,7 @@ private:
     } result_signed;
 };
 
-bool BenchmarkApp::run() {
+bool BenchmarkApp::custom_run() {
 
     printf("Input size: %lu, loops: %lu\n", get_size(), get_loop_count());
 

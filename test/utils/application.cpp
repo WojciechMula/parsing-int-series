@@ -69,6 +69,18 @@ Application::Application(int argc, char* argv[])
     , rd()
     , random(rd())
 {
+
+}
+
+bool Application::run() {
+    init();
+    custom_init();
+    return custom_run();
+}
+
+
+void Application::init() {
+
     if (cmdline.empty() || cmdline.has_flag("-h") || cmdline.has_flag("--help")) {
         print_help();
         throw Application::Exit();
@@ -105,7 +117,6 @@ Application::Application(int argc, char* argv[])
     } else {
         sign_nonnull = false;
     }
-
 }
 
 std::string Application::generate_unsigned() {
@@ -165,13 +176,24 @@ void Application::print_help() const {
     puts("--seed=NUMBER         seed for random number generator [default: 0]");
     puts("--num=DISTRIBUTION    distribution of lengths of numbers");
     puts("--sep=DISTRIBUTION    distribution of lengths of gaps between numbers [default: '1']");
-    puts("--separators=string   list of separator characters [default: \",; \"");
+    puts("--separators=string   list of separator characters [default: \",; \"]");
     puts("--sign=DISTRIBUTION   distribution of sign in front of number [default: '1']");
     puts("--debug=K             prints K first bytes of generated input [default: 0]");
     puts("");
     puts("Distribution is given as a list of comma-separated values.");
     puts("For --num and --sep the list length is unbound, for --sign it");
     puts("must have exactly three items.");
+
+    puts("");
+    print_custom_help();
 }
 
 
+void Application::custom_init() {
+    // do nothing
+}
+
+
+void Application::print_custom_help() const {
+    // do nothing
+}

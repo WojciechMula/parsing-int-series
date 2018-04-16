@@ -25,7 +25,8 @@ public:
         : Application(argc, argv)
         , separators(";, ") {}
 
-    bool run();
+private:
+    virtual bool custom_run() override;
 
 private:
     void run_sse_parser() {
@@ -58,7 +59,7 @@ private:
 
 };
 
-bool CompareApp::run() {
+bool CompareApp::custom_run() {
 
     input_string = generate_signed();
     scalar::parse_signed(input_string.data(),

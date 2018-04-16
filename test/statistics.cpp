@@ -17,14 +17,16 @@ class StatisticsApp: public Application {
 public:
     StatisticsApp(int argc, char** argv) : Application(argc, argv) {}
     
-    void run();
+private:
+    virtual bool custom_run() override;
+    virtual void print_custom_help() const override;
 
 private:
     void run_unsigned();
     void run_signed();
 };
 
-void StatisticsApp::run() {
+bool StatisticsApp::custom_run() {
     if (has_signed_distribution()) {
         run_signed();
     } else {
@@ -42,6 +44,12 @@ void StatisticsApp::run() {
             printf("Can't open '%s': %s\n", path.c_str(), strerror(errno));
         }
     }
+
+    return true;
+}
+
+void StatisticsApp::print_custom_help() const {
+    puts("--histogram-file=PATH -- save histogram of span_mask in a CSV file");
 }
 
 void StatisticsApp::run_unsigned() {

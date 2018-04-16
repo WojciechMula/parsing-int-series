@@ -15,7 +15,7 @@ class CompareApp: public Application {
 public:
     CompareApp(int argc, char** argv) : Application(argc, argv) {}
 
-    bool run();
+    virtual bool custom_run() override;
 
 private:
     void dump(const Vector& vec) const;
@@ -23,7 +23,8 @@ private:
 
 };
 
-bool CompareApp::run() {
+
+bool CompareApp::custom_run() {
 
     const auto tmp = generate_signed();
 

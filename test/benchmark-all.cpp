@@ -26,8 +26,8 @@ class BenchmarkApp: public Application {
 public:
     BenchmarkApp(int argc, char** argv) : Application(argc, argv) {}
 
-public:
-    bool run() {
+private:
+    virtual bool custom_run() override {
         if (has_signed_distribution()) {
             return run_signed();
         } else {
@@ -35,7 +35,6 @@ public:
         }
     }
 
-private:
     bool run_unsigned();
     bool run_signed();
 
