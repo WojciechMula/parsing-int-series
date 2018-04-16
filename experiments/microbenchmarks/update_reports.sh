@@ -5,5 +5,5 @@ do
     SRC=$f
     TRG="${SRC%.txt}".rst
     echo "(re)creating $TRG"
-    python report.py $SRC "^#" > $TRG
+    python report.py $SRC "#*" > $TRG
 done
