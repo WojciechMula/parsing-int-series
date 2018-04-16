@@ -54,7 +54,7 @@ def get_separator_title(sep_distribution):
     else:
         sep = sep_distribution
 
-    if sep == [1]:
+    if sep == ['1']:
         separator = 'single separator character'
     else:
         k = len(sep)
