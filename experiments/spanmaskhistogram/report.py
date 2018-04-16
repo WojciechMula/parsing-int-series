@@ -38,7 +38,7 @@ class Report(object):
     def prepare_table(self, stats):
 
         t = Table()
-        t.add_header(["paramters", ("distinct span masks count", 5)])
+        t.add_header(["parameters", ("distinct span masks count", 5)])
         t.add_header(["", "< 25%", "< 50%", "< 75%", "< 95%", "100%"])
 
         splitted = splitsorted(stats, lambda item: item[0])

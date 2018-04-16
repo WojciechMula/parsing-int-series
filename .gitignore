@@ -16,6 +16,9 @@ overall.txt
 microbenchmarks.txt
 microbenchmarks.rst
 
+# other data
+spanpatternhistogram.rst
+
 perf.data
 perf.data.old
 

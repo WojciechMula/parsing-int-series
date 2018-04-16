@@ -197,3 +197,9 @@ microbenchmarks.rst: microbenchmarks.txt experiments/microbenchmarks/report.py e
 	python experiments/microbenchmarks/report.py $< "^#" > /tmp/$@
 	mv /tmp/$@ $@
 
+# span_pattern histogram
+
+spanpatternhistogram.rst: bin/statistics experiments/spanmaskhistogram/experiment.py experiments/spanmaskhistogram/*.py
+	python experiments/spanmaskhistogram/experiment.py /tmp/$@ "^"
+	mv /tmp/$@ $@
+
