@@ -29,7 +29,7 @@ class Report(object):
         if self.report is None:
             self.report = []
             for size, statistics in self.tmp:
-                title = 'Size {:,d} bytes'.format(size)
+                title = 'Input size {:,d} bytes'.format(size)
                 self.report.append((title, self.prepare_table(statistics)))
 
         return self.report
