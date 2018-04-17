@@ -208,6 +208,10 @@ microbenchmarks.rst: microbenchmarks.txt experiments/microbenchmarks/report.py e
 
 # span_pattern histogram
 
+hwevents.txt: bin/benchmark-hwevents experiments/hwevents/experiment.py experiments/hwevents/runner.py
+	python experiments/hwevents/experiment.py > /tmp/$@
+	mv /tmp/$@ $@
+
 spanmaskhistogram.txt: bin/spanmaskhistogram experiments/spanmaskhistogram/experiment.py experiments/spanmaskhistogram/testcases.py
 	python experiments/spanmaskhistogram/experiment.py > /tmp/$@
 	mv /tmp/$@ $@

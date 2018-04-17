@@ -20,6 +20,9 @@ microbenchmarks.rst
 spanmaskhistogram.txt
 spanmaskhistogram.rst
 
+# hwevents
+hwevents.txt
+
 perf.data
 perf.data.old
 
