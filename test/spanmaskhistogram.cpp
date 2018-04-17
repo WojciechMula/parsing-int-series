@@ -3,64 +3,43 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "input_generator.h"
 #include "sse/sse-matcher.h"
-#include "sse/sse-parser-unsigned.h"
 #include "sse/sse-parser-signed.h"
 
 #include "application.h"
 
-class StatisticsApp: public Application {
+class App: public Application {
 
     using Vector = std::vector<uint32_t>;
 
 public:
-    StatisticsApp(int argc, char** argv) : Application(argc, argv) {}
+    App(int argc, char** argv) : Application(argc, argv) {}
     
 private:
     virtual bool custom_run() override;
-
-private:
-    void run_unsigned();
-    void run_signed();
+    virtual void custom_init() override;
 };
 
-bool StatisticsApp::custom_run() {
-    if (has_signed_distribution()) {
-        run_signed();
-    } else {
-        run_unsigned();
-    }
-
-    return true;
+void App::custom_init() {
+    quiet = true;
 }
 
-void StatisticsApp::run_unsigned() {
-
-    const auto tmp = generate_unsigned();
-
-    const char* separators = ",; ";
-    sse::NaiveMatcher<8> matcher(separators);
-    std::vector<uint32_t> result;
-    sse::parser(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
-    sse::stats.print();
-}
-
-void StatisticsApp::run_signed() {
-
+bool App::custom_run() {
     const auto tmp = generate_signed();
 
     const char* separators = ",; ";
     sse::NaiveMatcher<8> matcher(separators);
     std::vector<int32_t> result;
     sse::parser_signed(tmp.data(), tmp.size(), separators, std::move(matcher), std::back_inserter(result));
-    sse::stats.print();
+    sse::stats.span_mask_histogram_to_csv(stdout);
+
+    return true;
 }
 
 int main(int argc, char* argv[]) {
 
     try {
-        StatisticsApp app(argc, argv);
+        App app(argc, argv);
 
         app.run();
 #ifndef USE_STATISTICS

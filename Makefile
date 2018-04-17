@@ -71,7 +71,9 @@ TEST= \
     bin/compare-signed \
     bin/compare-unsigned \
     bin/compare-avx512 \
-    bin/statistics
+    bin/statistics \
+    bin/spanmaskhistogram
+
 
 ALL=$(UNITTESTS) $(BENCHMARK) $(TEST)
 
@@ -139,6 +141,9 @@ bin/compare-avx512: test/compare-avx512.cpp $(PARSER_AVX512_DEPS) $(CMDLINE_DEPS
 	$(CXX) $(FLAGS) -mavx512vbmi $(CMDLINE_OBJ) $< -o $@
 
 bin/statistics: test/statistics.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) obj/sse-parser-statistics.o
+	$(CXX) $(FLAGS) $(CMDLINE_OBJ) -DUSE_STATISTICS obj/sse-parser-statistics.o $< -o $@
+
+bin/spanmaskhistogram: test/spanmaskhistogram.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) obj/sse-parser-statistics.o
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) -DUSE_STATISTICS obj/sse-parser-statistics.o $< -o $@
 
 # cmdline utilites
