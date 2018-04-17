@@ -27,7 +27,7 @@ class Report(object):
             get_num_distribution_parameters(item.distribution_name, item.numbers_distribution).title,
             get_separator_title(item.separators_distribution))
 
-        self.tmp[-1][1].append((item.distribution_name, title, item.histogram))
+        self.tmp[-1][1].append((item.distribution_name, title, item.histogram, item.hwevents))
 
 
     def get(self):
@@ -43,22 +43,33 @@ class Report(object):
     def prepare_table(self, stats):
 
         t = Table()
-        t.add_header(["parameters", ("distinct span masks count", 5)])
-        t.add_header(["", "< 25%", "< 50%", "< 75%", "< 95%", "100%"])
+        t.add_header(["parameters", ("distinct span masks count", 5), ("branches", 3), ("cache references", 3)])
+        t.add_header(["", "< 25%", "< 50%", "< 75%", "< 95%", "100%", "taken", "mispredicted", "ratio", "count", "missed", "ratio"])
 
         splitted = splitsorted(stats, lambda item: item[0])
 
         for subarray in splitted:
             distribution_name = subarray[0][0]
             title = get_distribution_title(distribution_name)
-            t.add_row([(title, 6)])
+            t.add_row([(title, 12)])
 
-            for distribution_name, parameters, histogram in subarray:
+            for distribution_name, parameters, histogram, hwevents in subarray:
+
+                row = [parameters]
+
+                # histogram
                 weights = [0.25, 0.50, 0.75, 0.95, 1.00]
                 tmp = self.process_histogram(histogram, weights)
-                row = [parameters]
                 for w in weights:
                     row.append('%d' % tmp[w])
+
+                # hwevents
+                row.append('%d' % hwevents.branches)
+                row.append('%d' % hwevents.branch_misses)
+                row.append('%0.2f%%' % (100.0 * hwevents.get_branch_miss_ratio()))
+                row.append('%d' % hwevents.cache_references)
+                row.append('%d' % hwevents.cache_misses)
+                row.append('%0.2f%%' % (100.0 * hwevents.get_cache_miss_ratio()))
 
                 t.add_row(row)
 
@@ -90,14 +101,20 @@ class Report(object):
 
 def main():
     report = Report()
-    for item in load(sys.argv[1]):
+
+    spanmaskhistogram   = sys.argv[1]
+    hwevents            = sys.argv[2]
+    output              = sys.argv[3]
+    restseparator       = sys.argv[4]
+
+    for item in load(spanmaskhistogram, hwevents):
         report.add(item)
 
     data = report.get()
 
-    with open(sys.argv[2], 'wt') as f:
+    with open(output, 'wt') as f:
         writer = RestWriter(f, data)
-        writer.write(sys.argv[3])
+        writer.write(restseparator)
 
 
 if __name__ == '__main__':

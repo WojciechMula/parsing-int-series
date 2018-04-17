@@ -216,7 +216,7 @@ spanmaskhistogram.txt: bin/spanmaskhistogram experiments/spanmaskhistogram/exper
 	python experiments/spanmaskhistogram/experiment.py > /tmp/$@
 	mv /tmp/$@ $@
 
-spanmaskhistogram.rst: spanmaskhistogram.txt experiments/spanmaskhistogram/report.py experiments/spanmaskhistogram/report_writer.py
-	python experiments/spanmaskhistogram/report.py $< /tmp/$@ "^"
+spanmaskhistogram.rst: spanmaskhistogram.txt hwevents.txt experiments/spanmaskhistogram/report.py experiments/spanmaskhistogram/report_writer.py
+	python experiments/spanmaskhistogram/report.py spanmaskhistogram.txt hwevents.txt /tmp/$@ "^"
 	mv /tmp/$@ $@
 
