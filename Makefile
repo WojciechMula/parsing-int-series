@@ -122,6 +122,9 @@ bin/benchmark: test/benchmark.cpp $(PARSER_DEPS) $(CMDLINE_DEPS)
 bin/benchmark-all: test/benchmark-all.cpp $(PARSER_DEPS) $(CMDLINE_DEPS) $(PARSER_HYBRID_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
+bin/benchmark-hwevents: test/benchmark-hwevents.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS)
+	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
+
 bin/benchmark-cpuclocks: test/benchmark-cpuclocks.cpp $(PARSER_SIGNED_DEPS) $(CMDLINE_DEPS) $(PARSER_HYBRID_DEPS)
 	$(CXX) $(FLAGS) $(CMDLINE_OBJ) $< -o $@
 
