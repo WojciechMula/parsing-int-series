@@ -62,15 +62,15 @@ namespace {
         return std::string{set.begin(), set.end()};
     }
 
-}
+} // namespace unnamed
+
 
 Application::Application(int argc, char* argv[])
     : cmdline(argc, argv)
+    , quiet(false)
     , rd()
-    , random(rd())
-{
+    , random(rd()) {}
 
-}
 
 bool Application::run() {
     init();
@@ -123,7 +123,8 @@ std::string Application::generate_unsigned() {
 
     std::string tmp;
 
-    measure_time("generating random unsigned numbers ", [&tmp, this]{
+    const std::string msg = (quiet) ? "" : "generating random unsigned numbers ";
+    measure_time(msg, [&tmp, this]{
         tmp = ::generate_unsigned(
                     size,
                     get_separators_set(),
@@ -133,7 +134,7 @@ std::string Application::generate_unsigned() {
     });
     assert(tmp.size() == size);
 
-    if (debug_size > 0) {
+    if (!quiet && debug_size > 0) {
         printf("first %lu bytes of the data:\n", debug_size);
         fwrite(tmp.data(), debug_size, 1, stdout);
         putchar('\n');
@@ -146,7 +147,8 @@ std::string Application::generate_signed() {
 
     std::string tmp;
 
-    measure_time("generating random signed numbers ", [&tmp, this]{
+    const std::string msg = (quiet) ? "" : "generating random signed numbers ";
+    measure_time(msg, [&tmp, this]{
         tmp = ::generate_signed(
                     size,
                     get_separators_set(),
@@ -157,7 +159,7 @@ std::string Application::generate_signed() {
     });
     assert(tmp.size() == size);
 
-    if (debug_size > 0) {
+    if (!quiet && debug_size > 0) {
         printf("first %lu bytes of the data:\n", debug_size);
         fwrite(tmp.data(), debug_size, 1, stdout);
         putchar('\n');

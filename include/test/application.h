@@ -19,6 +19,9 @@ public:
 protected:
     CommandLine cmdline;
 
+protected:
+    bool quiet;
+
 private:
     size_t size;
     size_t debug_size;

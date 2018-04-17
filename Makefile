@@ -64,7 +64,8 @@ UNITTESTS= \
 BENCHMARK= \
     bin/benchmark \
     bin/benchmark-all \
-    bin/benchmark-cpuclocks
+    bin/benchmark-cpuclocks \
+    bin/benchmark-hwevents
 
 TEST= \
     bin/compare-signed \

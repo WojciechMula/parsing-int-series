@@ -30,7 +30,8 @@ private:
 };
 
 void BenchmarkApp::custom_init() {
-    csv = cmdline.has_flag("--csv-output");
+    csv   = cmdline.has_flag("--csv-output");
+    quiet = csv;
 }
 
 bool BenchmarkApp::custom_run() {
