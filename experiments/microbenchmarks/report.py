@@ -5,7 +5,7 @@ if __name__ == '__main__' and __package__ is None:
     sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from table import Table
-from loader import load, procedures, reference_procedure
+from loader import load_file as load, procedures, reference_procedure
 from utils import groupby
 from writer import RestWriter
 from prettyprint import *

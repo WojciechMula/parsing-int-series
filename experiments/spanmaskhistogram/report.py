@@ -27,7 +27,7 @@ class Report(object):
             get_num_distribution_parameters(item.distribution_name, item.numbers_distribution).title,
             get_separator_title(item.separators_distribution))
 
-        self.tmp[-1][1].append((item.distribution_name, title, item.histogram, item.hwevents))
+        self.tmp[-1][1].append((item.distribution_name, title, item.histogram, item.hwevents, item.cycles))
 
 
     def get(self):
@@ -43,17 +43,17 @@ class Report(object):
     def prepare_table(self, stats):
 
         t = Table()
-        t.add_header(["parameters", ("distinct span masks count", 5), ("branches", 3), ("cache references", 3)])
-        t.add_header(["", "< 25%", "< 50%", "< 75%", "< 95%", "100%", "taken", "mispredicted", "ratio", "count", "missed", "ratio"])
+        t.add_header(["parameters", ("distinct span masks count", 5), ("cycles per byte", 2), ("branches", 3), ("cache references", 3)])
+        t.add_header(["", "< 25%", "< 50%", "< 75%", "< 95%", "100%", "min", "avg", "taken", "mispredicted", "ratio", "count", "missed", "ratio"])
 
         splitted = splitsorted(stats, lambda item: item[0])
 
         for subarray in splitted:
             distribution_name = subarray[0][0]
             title = get_distribution_title(distribution_name)
-            t.add_row([(title, 12)])
+            t.add_row([(title, 14)])
 
-            for distribution_name, parameters, histogram, hwevents in subarray:
+            for distribution_name, parameters, histogram, hwevents, cycles in subarray:
 
                 row = [parameters]
 
@@ -62,6 +62,14 @@ class Report(object):
                 tmp = self.process_histogram(histogram, weights)
                 for w in weights:
                     row.append('%d' % tmp[w])
+
+                # cycles
+                if cycles is None:
+                    row.append('')
+                    row.append('')
+                else:
+                    row.append('%0.3f' % cycles[0])
+                    row.append('%0.3f' % cycles[1])
 
                 # hwevents
                 row.append('%d' % hwevents.branches)
@@ -104,10 +112,11 @@ def main():
 
     spanmaskhistogram   = sys.argv[1]
     hwevents            = sys.argv[2]
-    output              = sys.argv[3]
-    restseparator       = sys.argv[4]
+    microbenchmarks     = sys.argv[3]
+    output              = sys.argv[4]
+    restseparator       = sys.argv[5]
 
-    for item in load(spanmaskhistogram, hwevents):
+    for item in load(spanmaskhistogram, hwevents, microbenchmarks):
         report.add(item)
 
     data = report.get()
