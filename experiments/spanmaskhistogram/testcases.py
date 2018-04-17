@@ -1,6 +1,6 @@
 from distribution import *
 
-def distributions():
+def testcases():
     sign_distribution = [1,1,1]
 
     for size in sizes:

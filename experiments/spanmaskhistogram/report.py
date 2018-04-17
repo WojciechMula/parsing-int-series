@@ -1,9 +1,14 @@
 import sys
 import os.path
 
+if __name__ == '__main__' and __package__ is None:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from table import Table
 from utils import splitsorted
 from prettyprint import *
+from loader import load
+from report_writer import RestWriter
 
 
 class Report(object):
@@ -13,16 +18,16 @@ class Report(object):
         self.tmp = []
         self.prev_size = None
 
-    def add(self, size, distribution_name, numbers_distribution, separators_distribution, sign_distribution, path):
-        if size != self.prev_size:
-            self.prev_size = size
-            self.tmp.append((size, []))
+    def add(self, item):
+        if item.size != self.prev_size:
+            self.prev_size = item.size
+            self.tmp.append((item.size, []))
 
         title = '%s, %s' % (
-            get_num_distribution_parameters(distribution_name, numbers_distribution).title,
-            get_separator_title(separators_distribution))
+            get_num_distribution_parameters(item.distribution_name, item.numbers_distribution).title,
+            get_separator_title(item.separators_distribution))
 
-        self.tmp[-1][1].append((distribution_name, title, path))
+        self.tmp[-1][1].append((item.distribution_name, title, item.histogram))
 
 
     def get(self):
@@ -48,8 +53,7 @@ class Report(object):
             title = get_distribution_title(distribution_name)
             t.add_row([(title, 6)])
 
-            for distribution_name, parameters, path in subarray:
-                histogram = self.parse_file(path)
+            for distribution_name, parameters, histogram in subarray:
                 weights = [0.25, 0.50, 0.75, 0.95, 1.00]
                 tmp = self.process_histogram(histogram, weights)
                 row = [parameters]
@@ -84,14 +88,18 @@ class Report(object):
         return result
 
 
-    def parse_file(self, path):
-        res = []
-        with open(path, 'rt') as f:
-            for line in f:
-                F = line.split(',')
-                mask  = int(F[0].strip(), 16)
-                count = int(F[1].strip())
+def main():
+    report = Report()
+    for item in load(sys.argv[1]):
+        report.add(item)
 
-                res.append((mask, count))
+    data = report.get()
 
-        return res
+    with open(sys.argv[2], 'wt') as f:
+        writer = RestWriter(f, data)
+        writer.write(sys.argv[3])
+
+
+if __name__ == '__main__':
+    main()
+
