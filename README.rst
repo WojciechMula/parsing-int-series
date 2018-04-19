@@ -2,10 +2,14 @@
                 Parsing series of integers with SIMD
 ================================================================================
 
-Sample programs for article (to be published). Parsers extract integer numbers
-from strings. A number can be prepended by a sign character. The numbers are
-separated by arbitrary sequences of separator chars. All other characters
-are invalid and the parsers detects them and raise exception.
+Sample programs for article `Parsing series of integers with SIMD`__
+
+__ http://0x80.pl/articles/simd-parsing-int-sequences.html
+
+Parsers extract integer numbers from strings. A number can be prepended by a
+sign character. The numbers are separated by arbitrary sequences of separator
+chars. All other characters are invalid and the parsers detects them and raise
+exception.
 
 This repository contains:
 
@@ -15,8 +19,8 @@ This repository contains:
 * scalar hybrid that combines ideas from SIMD parsing with scalar
   conversion procedures.
 
-
 Requires: C++11 compiler (tested with GCC 7.3) and Python 2.7.
+
 
 Usage
 --------------------------------------------------------------------------------
@@ -26,9 +30,12 @@ Type ``make`` to build all programs.
 Type ``make run-tests`` to build all unit tests and then run them.
 Some tests are time consuming, be patient.
 
-Type ``make microbenchmarks.rst`` to run benchmarks.
+Type ``make microbenchmarks.rst`` to run microbenchmarks.
 
 Type ``make report-overall.rst`` to run performance benchmarks.
+
+Type ``make spanmaskhistogram.rst`` to produce runtime analysis report
+for SSE implementation.
 
 
 Programs
@@ -84,8 +91,6 @@ will force all numbers negative.
 
 TODO
 --------------------------------------------------------------------------------
-
-Important:
 
 * Complete AVX512 implementation to handle scalar fallback.
 
