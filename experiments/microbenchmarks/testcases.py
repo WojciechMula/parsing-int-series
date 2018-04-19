@@ -6,6 +6,10 @@ def testcases():
     for size, loops in sizes:
         for separator_distribution in separator_distributions:
             for k in range(1, 8 + 1):
+                numbers_distribution = single_digit_distribution(k)
+                yield size, loops, 'single', numbers_distribution, separator_distribution, sign_distribution
+
+            for k in range(1, 8 + 1):
                 numbers_distribution = uniform_distribution(k)
                 yield size, loops, 'uniform', numbers_distribution, separator_distribution, sign_distribution
 
