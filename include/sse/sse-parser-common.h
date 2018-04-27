@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cassert>
+#include <limits>
 #include <stdexcept>
 
 #include "sse-utils.h"
