@@ -35,7 +35,7 @@ std::string CommandLine::get_value(const std::string& option) const {
     for (size_t i=0; i < args.size(); i++) {
         if (args[i] == option) {
             try {
-                return args[i + 1];
+                return args.at(i + 1);
             } catch (std::out_of_range&) {
                 throw OptionNotFound("Argument " + args[i] + " should be followed by a value");
             }
