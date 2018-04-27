@@ -47,7 +47,6 @@ PARSER_AVX512_DEPS=$(PARSER_COMMON_HEADERS) $(PARSER_AVX512_HEADERS) $(PARSER_OB
 CMDLINE_OBJ= \
     obj/application.o \
     obj/command_line.o \
-    obj/discrete_distribution.o \
     obj/input_generator.o \
     $(PARSER_OBJ)
 
@@ -154,7 +153,7 @@ bin/spanmaskhistogram: test/spanmaskhistogram.cpp $(PARSER_DEPS) $(CMDLINE_DEPS)
 # cmdline utilites
 # --------------------------------------------------------------------------------
 
-obj/application.o: test/utils/application.cpp include/test/*.h obj/command_line.o obj/discrete_distribution.o obj/input_generator.o
+obj/application.o: test/utils/application.cpp include/test/*.h obj/command_line.o obj/input_generator.o
 	$(CXX) $(FLAGS) -c $< -o $@
 
 obj/command_line.o: test/utils/command_line.cpp include/test/command_line.h

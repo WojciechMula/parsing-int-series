@@ -2,10 +2,10 @@
 
 #include <cstddef>
 #include <map>
+#include <random>
 #include <string>
 
 #include "command_line.h"
-#include "discrete_distribution.h"
 
 class Application {
 
@@ -27,9 +27,9 @@ private:
     size_t debug_size;
     size_t loop_count;
     struct {
-        discrete_distribution numbers;
-        discrete_distribution separators;
-        discrete_distribution sign;
+        std::discrete_distribution<> numbers;
+        std::discrete_distribution<> separators;
+        std::discrete_distribution<> sign;
     } distribution;
     bool sign_nonnull;
     std::string separators_set;

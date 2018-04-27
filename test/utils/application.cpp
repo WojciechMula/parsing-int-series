@@ -100,11 +100,11 @@ void Application::init() {
 
     {
         const auto arr = cmdline.parse_value<std::vector<long>>("--num", parse_array);
-        distribution.numbers = discrete_distribution(arr);
+        distribution.numbers = std::discrete_distribution<>(arr.begin(), arr.end());
     }
     {
         const auto arr = cmdline.parse_value<std::vector<long>>("--sep", parse_array, {1});
-        distribution.separators = discrete_distribution(arr);
+        distribution.separators = std::discrete_distribution<>(arr.begin(), arr.end());
     }
 
     if (cmdline.has_value("--sign")) {
@@ -112,7 +112,7 @@ void Application::init() {
         if (arr.size() != 3) {
             throw std::logic_error("--sign expects exactly three-item distribution, like --sign=5,2,1");
         }
-        distribution.sign = discrete_distribution(arr);
+        distribution.sign = std::discrete_distribution<>(arr.begin(), arr.end());
         sign_nonnull = true;
     } else {
         sign_nonnull = false;
@@ -129,8 +129,8 @@ std::string Application::generate_unsigned() {
                     size,
                     get_separators_set(),
                     random,
-                    distribution.numbers.get_distribution(),
-                    distribution.separators.get_distribution());
+                    distribution.numbers,
+                    distribution.separators);
     });
     assert(tmp.size() == size);
 
@@ -153,9 +153,9 @@ std::string Application::generate_signed() {
                     size,
                     get_separators_set(),
                     random,
-                    distribution.numbers.get_distribution(),
-                    distribution.separators.get_distribution(),
-                    distribution.sign.get_distribution());
+                    distribution.numbers,
+                    distribution.separators,
+                    distribution.sign);
     });
     assert(tmp.size() == size);
 
