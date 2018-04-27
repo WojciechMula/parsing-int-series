@@ -60,6 +60,7 @@ UNITTESTS= \
     bin/verify_sse_signed_parser_validation \
     bin/verify_sse_unsigned_conversion \
     bin/verify_sse_unsigned_parser \
+    bin/verify_sse_signed_overflow_detection \
 
 BENCHMARK= \
     bin/benchmark \
@@ -86,6 +87,7 @@ run-unittests: $(UNITTESTS)
 	./bin/test-stni-matcher
 	./bin/verify_sse_signed_parser
 	./bin/verify_sse_signed_parser_validation
+	./bin/verify_sse_signed_overflow_detection
 	./bin/verify_sse_unsigned_conversion
 	./bin/verify_sse_unsigned_parser
 
@@ -113,6 +115,9 @@ bin/verify_sse_unsigned_conversion: test/unittest/verify_sse_unsigned_conversion
 	$(CXX) $(FLAGS) $(PARSER_OBJ) $< -o $@
 
 bin/verify_sse_unsigned_parser: test/unittest/verify_sse_unsigned_parser.cpp $(PARSER_UNSIGNED_DEPS)
+	$(CXX) $(FLAGS) $(PARSER_OBJ) $< -o $@
+
+bin/verify_sse_signed_overflow_detection: test/unittest/verify_sse_signed_overflow_detection.cpp $(PARSER_SIGNED_DEPS)
 	$(CXX) $(FLAGS) $(PARSER_OBJ) $< -o $@
 
 

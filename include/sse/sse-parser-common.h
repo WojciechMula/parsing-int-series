@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cassert>
+#include <stdexcept>
 
 #include "sse-utils.h"
 #include "sse-convert.h"
@@ -56,14 +57,25 @@ namespace sse {
             } else {
                 uint32_t result = 0;
                 bool converted = false;
+
                 data += bi.first_skip;
                 while (data < end && *data >= '0' && *data <= '9') {
-                    result = result * 10 + (*data - '0');
+                    if (__builtin_umul_overflow(result, 10, &result)) {
+                        throw std::range_error("unsigned 32-bit overflow");
+                    }
+
+                    if (__builtin_uadd_overflow(result, *data - '0', &result)) {
+                        throw std::range_error("unsigned 32-bit overflow");
+                    }
+
                     data += 1;
                     converted = true;
                 }
 
                 if (converted) {
+                    if (result > std::numeric_limits<int32_t>::max()) {
+                        throw std::range_error("unsigned 32-bit overflow");
+                    }
                     *output++ = result;
                 }
 
@@ -134,7 +146,7 @@ namespace sse {
 
             } else {
                 bool converted = false;
-                int32_t result;
+                uint32_t result;
                 bool negative;
 
                 data += bi.first_skip;
@@ -154,15 +166,30 @@ namespace sse {
                 }
 
                 while (data < end && *data >= '0' && *data <= '9') {
-                    result = result * 10 + (*data - '0');
+                    if (__builtin_umul_overflow(result, 10, &result)) {
+                        throw std::range_error("unsigned 32-bit overflow");
+                    }
+
+                    if (__builtin_uadd_overflow(result, *data - '0', &result)) {
+                        throw std::range_error("unsigned 32-bit overflow");
+                    }
+
                     data += 1;
                     converted = true;
                 }
 
                 if (converted) {
                     if (negative) {
+                        const uint32_t absmin = -std::numeric_limits<int32_t>::min();
+                        if (result > absmin) {
+                            throw std::range_error("signed 32-bit overflow");
+                        }
                         *output++ = -result;
                     } else {
+                        const uint32_t max = std::numeric_limits<int32_t>::max();
+                        if (result > max) {
+                            throw std::range_error("signed 32-bit overflow");
+                        }
                         *output++ = result;
                     }
                 }
