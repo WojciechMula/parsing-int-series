@@ -1,4 +1,5 @@
 #include <iterator>
+#include <algorithm>
 #include <cstdio>
 
 #include "sse/sse-parser-signed.h"
@@ -21,6 +22,7 @@ class Verify {
     char input_string[17];
     __m128i input;
     uint16_t block_id;
+    bool range_error_expected;
 
     using Vector = std::vector<int32_t>;
 
@@ -48,20 +50,34 @@ public:
 
             prepare();
             sse::NaiveMatcher<1> matcher(SEPARATOR);
-            sse::detail::process_chunk(
-                input_string,
-                input_string + 16,
-                input,
-                matcher,
-                std::back_inserter(parsed_values));
+            try {
+                sse::detail::process_chunk(
+                    input_string,
+                    input_string + 16,
+                    input,
+                    matcher,
+                    std::back_inserter(parsed_values));
 
-            if (!compare(input_values, parsed_values)) {
-                printf("input id     : %ld\n", id);
-                printf("input string : '%s'\n", input_string);
-                printf("block id     : %02x\n", block_id);
-                printf("expected     :"); dump(input_values);
-                printf("parsed       :"); dump(parsed_values);
-                return false;
+                if (range_error_expected) {
+                    puts("expected range error");
+                    printf("input string : '%s'\n", input_string);
+                    return false;
+                }
+
+                if (!compare(input_values, parsed_values)) {
+                    printf("input id     : %ld\n", id);
+                    printf("input string : '%s'\n", input_string);
+                    printf("block id     : %02x\n", block_id);
+                    printf("expected     :"); dump(input_values);
+                    printf("parsed       :"); dump(parsed_values);
+                    return false;
+                }
+            } catch (std::range_error&) {
+                if (!range_error_expected) {
+                    puts("unexpected range error");
+                    printf("input string : '%s'\n", input_string);
+                    return false;
+                }
             }
 
             checked += 1;
@@ -166,6 +182,8 @@ private:
         bool negative = false;
         char digit = 1;
 
+        std::vector<bool> range_errors;
+        range_error_expected = false;
         for (int i=0; i < 16; i++) {
             switch (input_pattern[i]) {
                 // convert
@@ -177,6 +195,8 @@ private:
                         }
 
                         input_values.push_back(value);
+                        range_errors.push_back(range_error_expected);
+                        range_error_expected = false;
                     }
                     break;
                 
@@ -202,7 +222,13 @@ private:
                     }
 
                     input_string[i] = digit + '0';
-                    value = value * 10 + digit;
+                    uint32_t tmp = value;
+                    try {
+                        mul10_add_digit(tmp, input_string[i]);
+                        value = tmp;
+                    } catch (std::range_error&) {
+                        range_error_expected = true;
+                    }
                     digit = (digit + 1) % 10;
                     break;
             } // switch
@@ -215,6 +241,7 @@ private:
         const BlockInfo& bi = blocks[block_id];
         if (bi.element_count > 0) {
             input_values.resize(bi.element_count);
+            range_errors.resize(bi.element_count);
         } else {
             if (prev == Digit) {
                 if (negative) {
@@ -222,8 +249,11 @@ private:
                 }
 
                 input_values.push_back(value);
+                range_errors.push_back(range_error_expected);
             }
         }
+
+        range_error_expected = std::any_of(range_errors.begin(), range_errors.end(), [](bool x){return x;});
 
         input = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input_string));
     }
