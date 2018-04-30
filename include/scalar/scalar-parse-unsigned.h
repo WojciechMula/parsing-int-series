@@ -4,6 +4,7 @@
 #include <cstring>
 #include <stdexcept>
 
+#include "safe-convert.h"
 #include "scalar-parse-common.h"
 
 namespace scalar {
@@ -17,7 +18,7 @@ namespace scalar {
         for (size_t i=0; i < size; i++) {
             const char c = data[i];
             if (c >= '0' && c <= '9') {
-                result = 10 * result + (c - '0');
+                mul10_add_digit(result, c);
                 digits += 1;
             } else if (contains(separators, c)) {
                 if (digits > 0) {

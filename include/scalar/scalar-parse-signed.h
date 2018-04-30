@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>
+#include <limits>
 
+#include "safe-convert.h"
 #include "scalar-parse-common.h"
 
 namespace scalar {
@@ -21,7 +23,7 @@ namespace scalar {
         State state = Separator;
         State prev = Separator;
         bool negative = false;
-        int32_t number = 0;
+        uint32_t number = 0;
 
         for (size_t i=0; i < size; i++) {
             const char c = data[i];
@@ -59,15 +61,24 @@ namespace scalar {
                         number = c - '0';
                         negative = false;
                     } else {
-                        number = 10*number + c - '0';
+                        mul10_add_digit(number, c);
                     }
                     break;
 
                 case Separator:
                     if (prev == Digit) {
                         if (negative) {
+                            const int64_t tmp = std::numeric_limits<int32_t>::max();
+                            const uint32_t absmin = -tmp;
+                            if (number > absmin) {
+                                throw std::range_error("signed overflow");
+                            }
                             *output = -number;
                         } else {
+                            if (number > std::numeric_limits<int32_t>::max()) {
+                                throw std::range_error("signed overflow");
+                            }
+
                             *output = number;
                         }
                     } else if (prev != Separator) {
