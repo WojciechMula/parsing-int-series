@@ -26,6 +26,12 @@ class Test {
     char input_string[17];
     __m128i input;
 
+    enum class Result {
+        NoException,
+        OverflowException,
+        OtherException
+    };
+
 public:
     Test() {
         for (int i=0; i < 16; i++) {
@@ -61,12 +67,20 @@ private:
                 printf("%ld %s\n", id, input_string);
             }
 
-            const auto expected = is_valid();
-            const auto result   = SSE_validate_algorithm();
+            Result expected;
+            if (is_valid()) {
+                if (will_overflow())
+                    expected = Result::OverflowException;
+                else
+                    expected = Result::NoException;
+            } else {
+                expected = Result::OtherException;
+            }
 
-            if (expected != result) {
+            const Result result = SSE_validate_algorithm();
+
+            if (result != expected) {
                 printf("failed for %ld: %s\n", id, input_string);
-                printf("expected=%d, returned=%d\n", expected, result);
                 return false;
             }
             id += 1;
@@ -75,7 +89,7 @@ private:
         return true;
     }
 
-    bool SSE_validate_algorithm() {
+    Result SSE_validate_algorithm() {
         std::vector<int32_t> sink;
         try {
             sse::NaiveMatcher<1> matcher(SEP);
@@ -86,13 +100,13 @@ private:
                 matcher,
                 std::back_inserter(sink)
             );
-            return true;
-        } catch (...) {
-            return false;
+            return Result::NoException;
+        } catch (std::range_error&) {
+            return Result::OverflowException;
+        } catch (std::exception&) {
+            return Result::OtherException;
         }
     }
-
-
 
     void prepare() {
         render();
@@ -186,6 +200,69 @@ private:
         }
 
         return true;
+    }
+
+    uint16_t get_span_pattern() const {
+        // assume is_valid() == true
+        uint16_t result = 0;
+        uint16_t bit = 1;
+        for (int i=0; i < 16; i++, bit <<= 1) {
+            switch (input_pattern[i]) {
+                case Separator:
+                    break;
+
+                case Digit:
+                case Sign:
+                    result |= bit;
+                    break;
+
+                default:
+                    assert(false);
+                    return 0;
+
+            } // switch
+        }
+
+        return result;
+    }
+
+    bool will_overflow() const {
+        // assume is_valid() == true
+        const BlockInfo& b = blocks[get_span_pattern()];
+        if (b.conversion_routine != Conversion::Scalar) {
+            // only scalar code might cause overflow error
+            return false;
+        }
+
+        uint32_t result = 0;
+        bool negative = false;
+        for (int i=b.first_skip; i < 16; i++) {
+            switch (input_pattern[i]) {
+                case Separator:
+                    result = 0;
+                    negative = false;
+                    // scalar code converts just the first span
+                    return false;
+
+                case Digit:
+                    try {
+                        mul10_add_digit(result, DIGIT);
+                    } catch (std::range_error& e) {
+                        return true;
+                    }
+                    break;
+
+                case Sign:
+                    negative = true; // (MINUS == ((j++ % 2) ? PLUS : MINUS));
+                    result = 0;
+                    break;
+
+                default:
+                    assert(false);
+            } // switch
+        }
+
+        return false;
     }
 
 };
