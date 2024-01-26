@@ -53,7 +53,7 @@ class Parser(object):
 
     def __convert_to_string(self, x):
         s = ''
-        for i in xrange(8):
+        for i in range(8):
             if x & (1 << i):
                 s += DIGIT
             else:
@@ -102,7 +102,7 @@ class GeneratorBase(object):
         self.begin()
 
         self.lines = []
-        for number in xrange(2**8):
+        for number in range(2**8):
             self.number = number
             self.before()
             for (kind, span) in tokenize(number):

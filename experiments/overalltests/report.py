@@ -21,7 +21,7 @@ class Report(object):
         bysep = lambda item: item.sep_distribution
 
         self.report = []
-        for sep, collection in groupby(self.raw_data, bysep).iteritems():
+        for sep, collection in groupby(self.raw_data, bysep).items():
             ret = self.split_by_distribution(collection)
             self.report.append((
                 get_separator_title(sep),
@@ -38,7 +38,7 @@ class Report(object):
 
         bynum = lambda item: (item.distribution_name)
         tmp = groupby(collection, bynum)
-        for distribution_name, collection in tmp.iteritems():
+        for distribution_name, collection in tmp.items():
             res = self.split_by_parameters(distribution_name, collection)
             result.append((
                 get_distribution_title(distribution_name),
@@ -52,7 +52,7 @@ class Report(object):
         byparam = lambda item: item.num_distribution
 
         result = []
-        for key, collection in groupby(collection, byparam).iteritems():
+        for key, collection in groupby(collection, byparam).items():
             table = self.prepare_table(collection)
             ret   = get_num_distribution_parameters(distribution_name, key)
             result.append((
@@ -72,7 +72,7 @@ class Report(object):
         tmp = groupby(procedures, keyfun)
 
         data = []
-        for (size, loops), items in tmp.iteritems():
+        for (size, loops), items in tmp.items():
             def get_time(procedure):
                 for item in items:
                     if item.procedure == procedure:

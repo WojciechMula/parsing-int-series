@@ -23,7 +23,7 @@ class Runner(object):
         res  = proc.communicate()[0]
         ret  = proc.wait()
         if ret != 0:
-            print args
+            print(args)
             print res
             raise RuntimeError("program failed")
 

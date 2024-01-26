@@ -14,14 +14,14 @@ def main():
 
         r = Runner(size, numbers_distribution, separators_distribution, sign_distribution)
         result = r.run()
-        print "%d;%s;%s;%s;%s;%s" % (
+        print("%d;%s;%s;%s;%s;%s" % (
             size,
             distribution_name,
             numbers_distribution,
             separators_distribution,
             sign_distribution,
             result
-        )
+        ))
 
 
 if __name__ == '__main__':

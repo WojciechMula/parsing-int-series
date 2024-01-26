@@ -101,5 +101,5 @@ class GenerateSingedParser(GeneratorBase):
 if __name__ == '__main__':
     gen = GenerateSingedParser()
     for line in gen.get():
-        print line
+        print(line)
 

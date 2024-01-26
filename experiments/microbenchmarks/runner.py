@@ -21,8 +21,8 @@ class Runner(object):
         res  = proc.communicate()[0]
         ret  = proc.wait()
         if ret != 0:
-            print args
-            print res
+            print(args)
+            print(res)
             raise RuntimeError("program failed")
 
         return self.__parse_output(res)

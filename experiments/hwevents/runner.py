@@ -23,8 +23,8 @@ class Runner(object):
         res  = proc.communicate()[0]
         ret  = proc.wait()
         if ret != 0:
-            print args
-            print res
+            print(args)
+            print(res)
             raise RuntimeError("program failed")
 
         return self.__parse_output(res)
@@ -43,7 +43,7 @@ class Runner(object):
 
 
     def __parse_output(self, output):
-        return map(int, (s.strip() for s in output.split(',')))
+        return list(map(int, (s.strip() for s in output.split(b','))))
 
 
 def format_distribution(dist):

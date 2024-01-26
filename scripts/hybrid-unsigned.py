@@ -64,5 +64,5 @@ class GenerateUnsingedParser(GeneratorBase):
 if __name__ == '__main__':
     gen = GenerateUnsingedParser()
     for line in gen.get():
-        print line
+        print(line)
 

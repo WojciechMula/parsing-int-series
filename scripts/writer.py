@@ -71,7 +71,7 @@ class CPPWriter(object):
 
         if block.element_size == 4:
             if all(r.digits() == 3 for r in block.spans):
-                print block
+                print(block)
                 return 'Conversion::SSE3Digits'
             else:
                 return 'Conversion::SSE4Digits'

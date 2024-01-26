@@ -84,7 +84,7 @@ def main(path):
         table.add_row(row)
 
     
-    print table
+    print(table)
 
 if __name__ == '__main__':
     main(sys.argv[1])

@@ -46,4 +46,4 @@ if __name__ == '__main__':
             '%0.1f%%' % utilization,
         ])
 
-    print table
+    print(table)
