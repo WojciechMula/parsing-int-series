@@ -134,7 +134,7 @@ class RestructuredTextTableRenderer(object):
 
                 def widen(d):
                     while True:
-                        for i in xrange(index, index + count):
+                        for i in range(index, index + count):
                             self.widths[i] += 1
                             d -= 1
                             if d == 0:
@@ -149,7 +149,7 @@ class RestructuredTextTableRenderer(object):
         assert count >= 1
 
         w = 0
-        for index in xrange(start, start + count):
+        for index in range(start, start + count):
             w += self.widths[index]
             w += 2 * self.padding
 
@@ -255,7 +255,7 @@ if __name__ == '__main__':
     table.add_row(["bar", "105", "1.5"])
     table.add_row(["baz", "111", "0.2"])
 
-    print table
+    print(table)
 
 
     table2 = Table()
@@ -266,4 +266,4 @@ if __name__ == '__main__':
     table2.add_row(["9", "3", "A", "B", "C"])
     table2.add_row(["42", "-", ("N/A", 3)])
 
-    print table2
+    print(table2)

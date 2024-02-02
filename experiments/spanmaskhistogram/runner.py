@@ -22,8 +22,8 @@ class Runner(object):
         res  = proc.communicate()[0]
         ret  = proc.wait()
         if ret != 0:
-            print args
-            print res
+            print(args)
+            print(res)
             raise RuntimeError("program failed")
 
         return self.__parse_output(res)
@@ -42,7 +42,7 @@ class Runner(object):
     def __parse_output(self, output):
         res = []
         for line in output.splitlines():
-            F = line.split(',')
+            F = line.split(b',')
             mask  = int(F[0].strip(), 16)
             count = int(F[1].strip())
 

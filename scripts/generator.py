@@ -75,7 +75,7 @@ class Parser(object):
 
     def __convert_to_string(self, x):
         s = ''
-        for i in xrange(16):
+        for i in range(16):
             if x & (1 << i):
                 s += DIGIT
             else:
@@ -151,7 +151,7 @@ class BlockInfo(object):
             index  = element * self.element_size
             index += self.element_size - r.digits() # align to "right" within the vector's element
 
-            for i in xrange(r.first, r.last + 1):
+            for i in range(r.first, r.last + 1):
                 self.shuffle_digits[index] = i
                 index += 1
     
@@ -159,7 +159,7 @@ class BlockInfo(object):
         self.shuffle_signs = [0x80] * 16
         for element, r in enumerate(self.spans):
             index = element * self.element_size
-            for i in xrange(self.element_size):
+            for i in range(self.element_size):
                 self.shuffle_signs[index + i] = r.first
 
     def get_invalid_sign_mask(self):
@@ -197,7 +197,7 @@ class BlockInfo(object):
 
 class Generator(object):
     def run(self):
-        for i in xrange(2**16):
+        for i in range(2**16):
             yield self.__get_structure(i)
 
 
@@ -244,7 +244,7 @@ def main(path):
 
 if __name__ == '__main__':
     if len(sys.argv) < 1:
-        print "Usage: script output-path"
+        print("Usage: script output-path")
         sys.exit(1)
 
     main(sys.argv[1])

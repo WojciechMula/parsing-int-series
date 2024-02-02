@@ -27,7 +27,7 @@ Usage
 
 Type ``make`` to build all programs.
 
-Type ``make run-tests`` to build all unit tests and then run them.
+Type ``make run-unittests`` to build all unit tests and then run them.
 Some tests are time consuming, be patient.
 
 Type ``make microbenchmarks.rst`` to run microbenchmarks.

@@ -25,4 +25,4 @@ if __name__ == '__main__':
             '%0.2f%%' % (100 * cumulative/65536.0),
         ])
 
-    print table
+    print(table)

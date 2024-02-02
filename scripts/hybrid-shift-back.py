@@ -1,7 +1,7 @@
 from hybrid import Parser
 
 def get_shifts():
-    for number in xrange(2**8):
+    for number in range(2**8):
         parser = Parser(number)
         ranges = parser.get_ranges()
         if len(ranges) == 0:
@@ -18,7 +18,7 @@ def get_shifts():
 def main():
     shifts = list(get_shifts())
     shifts = map(str, shifts)
-    print "static int shift[256] = {%s};" % (','.join(shifts))
+    print("static int shift[256] = {%s};" % (','.join(shifts)))
 
 
 if __name__ == '__main__':
